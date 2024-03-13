@@ -10,6 +10,7 @@ class Node
 
 	Node(void* _data, size_t _data_Size, Node* _next_Node = nullptr)
 	{
+
 		data = _data;
 		data_Size = _data_Size;
 		next_Node = _next_Node;
@@ -22,6 +23,7 @@ private:
 	Node* head;
 	int list_Size;
 	Mem* mm;
+	//память не должна создаваться отдельно для каждого списка.
 
 public:
 	class RangeError
@@ -40,6 +42,11 @@ public:
 
 	~List();
 
+	Node* get_Head()
+	{
+		return this->head;
+	}
+
 	//Методы из ListAbstract.h
 	int push_front(void* elem, size_t elemSize);
 	void pop_front();
@@ -56,23 +63,26 @@ public:
 	bool empty();
 	class Iterator : public Container::Iterator
 	{
-		Node* current;
+	private:
+		Node* address;
+		List* lst;
+		//нужна запомни ещё что-то. например адресс на сам list
 	public:
-		Iterator(Node* _current)
+		Iterator(Node* _head = nullptr)
 		{
-			current = _current;
+			this->address = _head;
 		}
 		void* getElement(size_t& size);
 		bool hasNext();
 		void goToNext();
 		bool equals(Container::Iterator* right);
 	};
-	Iterator begin() {
+	/*Iterator begin() {
 		return Iterator(head);
 	}
 	Iterator end() {
 		return Iterator(nullptr);
-	}
+	}*/
 	void* operator[](const int index);
 };
 
