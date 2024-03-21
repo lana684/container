@@ -76,18 +76,24 @@ int List::size()
 	return list_Size;
 }
 
-//-? возвращает максимально доступное количсетво памяти у менеджера памяти
+//+-? возвращает максимально доступное количсетво памяти у менеджера памяти
 size_t List::max_bytes()
 {
 	size_t size_memory_manager = size();
 	return size_memory_manager;
 }
 
-//- на выход приходит итератор указывающий на первый элемент в списке который содержит elem
+//+- на выход приходит итератор указывающий на первый элемент в списке который содержит elem
 Container::Iterator* List::find(void* elem, size_t size)
 {
-	while (
-	List::Iterator* it = new List::Iterator(this->head);
+	Node* tmp = (Node*)front(head->data_Size);
+	if (tmp == nullptr)
+		return nullptr;
+	while (tmp->data != elem && tmp != nullptr)
+	{
+		tmp = tmp->next_Node;
+	}
+	List::Iterator* it = new List::Iterator(tmp);
 	return it;
 }
 
@@ -101,6 +107,22 @@ Container::Iterator* List::newIterator()
 //- удаление элемента списка на который указывает итератор
 void List::remove(Container::Iterator* iter)
 {
+	Node* address = head;
+	Node* bef_address = nullptr;
+	while (address->data != iter->getElement(address->data_Size) && address != nullptr)
+	{
+		bef_address = address;
+		address = address->next_Node;
+	}
+	//if (address == nullptr) //обработать ошибку с помощью обработчика
+	bef_address->next_Node = address->next_Node;
+	if (iter->hasNext() == 0)
+	{
+		
+	}
+	else
+		iter->goToNext();
+	delete(address);
 
 }
 //+ удаление всех элементов в списке
@@ -135,9 +157,10 @@ void List::Iterator::goToNext()
 }
 bool List::Iterator::equals(Container::Iterator* right)
 {
-	//нужен доп метод? матод выдачи ссылки... погоди... разве getelem не выдает нам указатель, что уникален для всех?
-	//нуэен метод для получения размера информации в элементе
-	/*if (current->data == right->getElement(???))*/ 
+	if (address->data != right->getElement(address->data_Size))
+		return false;
+	else
+		return true;
 	return 0;
 }
 
