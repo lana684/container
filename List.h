@@ -8,6 +8,8 @@ class Node
 	void* data;
 	size_t data_Size;
 
+	void* wdst_Node;  
+
 	Node(void* _data, size_t _data_Size, Node* _next_Node = nullptr)
 	{
 
@@ -22,7 +24,8 @@ class List : public AbstractList
 private:
 	Node* head;
 	int list_Size;
-	Mem* mm;
+	MemoryManager *mm;
+	void* wdst_List; //указатель на начало 
 	//память не должна создаваться отдельно для каждого списка.
 
 public:
@@ -35,6 +38,16 @@ public:
 		void out_of_range()
 		{
 			cout << "invalid index" << this->index << endl;
+		}
+	};
+	class Empty
+	{
+	public:
+		char msg[256];
+		Empty(const char* err_msg)
+		{
+			strcpy(msg, err_msg);
+			cout << msg << endl;
 		}
 	};
 
@@ -65,13 +78,17 @@ public:
 	{
 	private:
 		Node* address;
+		Node* first_elem;
+		Node* last_elem;
 		List* lst;
+		
+		bool in_the_end = 0;
+
 		//нужна запомни ещё что-то. например адресс на сам list
+		//нужно запомнить последний элемент списка.
+		//нужна переменная, которая отвечает за отслеживание, прошли ли мы до конца списка или нет
 	public:
-		Iterator(Node* _head = nullptr)
-		{
-			this->address = _head;
-		}
+		Iterator(Node* _head = nullptr);
 		void* getElement(size_t& size);
 		bool hasNext();
 		void goToNext();

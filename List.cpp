@@ -1,10 +1,16 @@
 #include "List.h"
 
+void* wdst_Global = nullptr;
+size_t mem_Size = -1;
+
+
 List::List(MemoryManager& mem) : AbstractList(mem)
 {
 	head = nullptr;
 	list_Size = 0;
-	//mm = (Mem)mem;
+	mm = &mem;
+	if (mem_Size < 0)
+		mem_Size = mm->size();
 }
 
 List::~List()
@@ -22,22 +28,19 @@ int List::push_front(void* elem, size_t elemSize)
 	//выделение памяти из memory оформить как метод list
 	//можно в node, но тогда каждая нода должна знать memory manager
 
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// мы в начале копируем данные в наш memory manager, данные из конструктора node
-	// после копирования данных мы Node указывавем нашу область памяти, в которой находятся наши данные
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	if (mem_Size - elemSize < 0) throw List::Empty("Net bolshe pamaty");
+	mem_Size -= elemSize;
+	void* wdst_elem = mm->allocMem(elemSize);
 
+	memcpy(wdst_elem, elem, elemSize); //~ копирование данных в выделенную нам область памяти
 
-
-	Node* new_Node = new Node(elem, elemSize); //позже использовать memory manager 
+	Node* new_Node = new Node(elem, elemSize); 
 	if (new_Node != nullptr)
 	{
 		new_Node->next_Node = head;
 		head = new_Node;
+		new_Node->wdst_Node = wdst_elem; //~ Узел смотрит туда, где находиться его информация в нашей памяти
 	}
-	//Добавить съедание памяти у менеджера памяти
-
-
 
 	if (head == nullptr)
 		return 1;
@@ -49,41 +52,70 @@ int List::push_front(void* elem, size_t elemSize)
 //+ удаление элемента из начала списка
 void List::pop_front()
 {
-	//добавить проверку на наличие элемента
-	//добавить обработчик на данной ошибки
+	if (head == nullptr) throw List::Empty("Head is absent");
 	Node* point_tmp = head;
+
+	mm->freeMem(point_tmp->wdst_Node);
+	mem_Size += point_tmp->data_Size;
+
 	head = head->next_Node;
 	delete point_tmp;
 	list_Size--;
 }
 
+//+ возврат указателя на первый элемент списка
 void* List::front(size_t&)
 {
-	//Стоит добавить проверку на наличие элемента в списке
-	//Можно использовать обработчик о котором говорится в pop_front
+	if (head == nullptr) throw List::Empty("Head is absent");
 	return head;
 }
 
-//- вставка по итератору
+//+? вставка по итератору
 int List::insert(Container::Iterator* iter, void* elem, size_t elemSize)
 {
+	if (mem_Size - elemSize < 0) throw List::Empty("Net bolshe pamaty");
+	mem_Size -= elemSize;
+	void* wdst_elem = mm->allocMem(elemSize);
+
+	memcpy(wdst_elem, elem, elemSize); //~ копирование данных в выделенную нам область памяти
+
+	Node* new_Node = new Node(elem, elemSize);
+	if (new_Node != nullptr)
+	{
+		Node* current = head;
+		Node* previous = nullptr;
+		while (current->data != iter->getElement(elemSize) && current != nullptr)
+		{
+			previous = current;
+			current = current->next_Node;
+		}
+		previous->next_Node = new_Node;
+		new_Node->next_Node = current;
+
+		new_Node->wdst_Node = wdst_elem; //~ Узел смотрит туда, где находиться его информация в нашей памяти
+	}
+
+	if (head == nullptr)
+		return 1;
+
+	list_Size++;
+	return 0;
 	return 0;
 }
 
-//+? выводит количество элементов в списке
+//+ выводит количество элементов в списке
 int List::size()
 {
 	return list_Size;
 }
 
-//+-? возвращает максимально доступное количсетво памяти у менеджера памяти
+//+ возвращает максимально доступное количсетво памяти у менеджера памяти
 size_t List::max_bytes()
 {
-	size_t size_memory_manager = size();
-	return size_memory_manager;
+	return  mm->size();
 }
 
-//+- на выход приходит итератор указывающий на первый элемент в списке который содержит elem
+//+ на выход приходит итератор указывающий на первый элемент в списке который содержит elem
 Container::Iterator* List::find(void* elem, size_t size)
 {
 	Node* tmp = (Node*)front(head->data_Size);
@@ -97,33 +129,39 @@ Container::Iterator* List::find(void* elem, size_t size)
 	return it;
 }
 
-//- создание новго итератора, который указывает изначально на head
+//+ создание новго итератора, который указывает изначально на head
 Container::Iterator* List::newIterator()
 {
 	List::Iterator* it = new List::Iterator(this->head);
 	return it;	
 }
 
-//- удаление элемента списка на который указывает итератор
+//+ удаление элемента списка на который указывает итератор
 void List::remove(Container::Iterator* iter)
 {
-	Node* address = head;
-	Node* bef_address = nullptr;
-	while (address->data != iter->getElement(address->data_Size) && address != nullptr)
+	Node* current = head;
+	Node* previous = nullptr;
+	while (current->data != iter->getElement(current->data_Size) && current != nullptr)
 	{
-		bef_address = address;
-		address = address->next_Node;
+		previous = current;
+		current = current->next_Node;
 	}
-	//if (address == nullptr) //обработать ошибку с помощью обработчика
-	bef_address->next_Node = address->next_Node;
+	if (current == nullptr) throw List::Empty("No elem");
 	if (iter->hasNext() == 0)
 	{
-		
+		previous->next_Node = nullptr;
+		iter->goToNext();
 	}
 	else
+	{
+		previous->next_Node = current->next_Node;
 		iter->goToNext();
-	delete(address);
+	}
 
+	mm->freeMem(current->wdst_Node);
+	mem_Size += current->data_Size;
+
+	delete(current);
 }
 //+ удаление всех элементов в списке
 void List::clear()
@@ -140,6 +178,14 @@ bool List::empty()
 }
 
 //методы итератора
+List::Iterator::Iterator(Node* _head)
+{
+	this->address = _head;
+	this->first_elem = _head;
+	this->last_elem = _head;
+	while (last_elem->next_Node != nullptr)
+		last_elem = last_elem->next_Node;
+}
 void* List::Iterator::getElement(size_t& size)
 {
 	return address->data;
@@ -147,13 +193,23 @@ void* List::Iterator::getElement(size_t& size)
 bool List::Iterator::hasNext()
 {
 	if (address->next_Node == nullptr)
+	{
+		in_the_end = 1;
 		return false;
+	}
 	else
+	{
+		if (address != first_elem)
+			in_the_end = 0;
 		return true;
+	}
 }
 void List::Iterator::goToNext()
 {
-	address = address->next_Node;
+	if (hasNext)
+		address = address->next_Node;
+	else
+		address = first_elem;
 }
 bool List::Iterator::equals(Container::Iterator* right)
 {
