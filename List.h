@@ -93,6 +93,8 @@ public:
 		bool hasNext();
 		void goToNext();
 		bool equals(Container::Iterator* right);
+
+		bool end();
 	};
 	/*Iterator begin() {
 		return Iterator(head);

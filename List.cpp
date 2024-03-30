@@ -219,6 +219,10 @@ bool List::Iterator::equals(Container::Iterator* right)
 		return true;
 	return 0;
 }
+bool List::Iterator::end()
+{
+	return in_the_end;
+}
 
 void* List::operator[](const int index)
 {
