@@ -4,11 +4,12 @@
 class Node 
 {
 	friend class List;
+
 	Node* next_Node;
 	void* data;
 	size_t data_Size;
 
-	void* wdst_Node;  
+	
 
 	Node(void* _data, size_t _data_Size, Node* _next_Node = nullptr)
 	{
@@ -25,8 +26,6 @@ private:
 	Node* head;
 	int list_Size;
 	MemoryManager *mm;
-	void* wdst_List; //указатель на начало 
-	//память не должна создаваться отдельно для каждого списка.
 
 public:
 	class RangeError
@@ -84,9 +83,6 @@ public:
 		
 		bool in_the_end = 0;
 
-		//нужна запомни ещё что-то. например адресс на сам list
-		//нужно запомнить последний элемент списка.
-		//нужна переменная, которая отвечает за отслеживание, прошли ли мы до конца списка или нет
 	public:
 		Iterator(Node* _head = nullptr);
 		void* getElement(size_t& size);

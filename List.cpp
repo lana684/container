@@ -1,6 +1,5 @@
 #include "List.h"
 
-void* wdst_Global = nullptr;
 size_t mem_Size = -1;
 
 
@@ -21,10 +20,6 @@ List::~List()
 //+ добавление элемента в начало списка 
 int List::push_front(void* elem, size_t elemSize)
 {
-
-	//при создании нового элемента мы выделяем память внутри нашего массива, каким-то необычным способом. Как? Придумай сам. 
-	//мы отделяем часть памяти которую требует наш новый элемент. В эту выделенную часть памяти мы копируем данные. Отнимаем нужное количество памяти
-
 	//выделение памяти из memory оформить как метод list
 	//можно в node, но тогда каждая нода должна знать memory manager
 
@@ -34,12 +29,11 @@ int List::push_front(void* elem, size_t elemSize)
 
 	memcpy(wdst_elem, elem, elemSize); //~ копирование данных в выделенную нам область памяти
 
-	Node* new_Node = new Node(elem, elemSize); 
+	Node* new_Node = new Node(wdst_elem, elemSize); 
 	if (new_Node != nullptr)
 	{
 		new_Node->next_Node = head;
 		head = new_Node;
-		new_Node->wdst_Node = wdst_elem; //~ Узел смотрит туда, где находиться его информация в нашей памяти
 	}
 
 	if (head == nullptr)
@@ -55,7 +49,7 @@ void List::pop_front()
 	if (head == nullptr) throw List::Empty("Head is absent");
 	Node* point_tmp = head;
 
-	mm->freeMem(point_tmp->wdst_Node);
+	mm->freeMem(point_tmp->data);
 	mem_Size += point_tmp->data_Size;
 
 	head = head->next_Node;
@@ -79,7 +73,7 @@ int List::insert(Container::Iterator* iter, void* elem, size_t elemSize)
 
 	memcpy(wdst_elem, elem, elemSize); //~ копирование данных в выделенную нам область памяти
 
-	Node* new_Node = new Node(elem, elemSize);
+	Node* new_Node = new Node(wdst_elem, elemSize);
 	if (new_Node != nullptr)
 	{
 		Node* current = head;
@@ -92,7 +86,6 @@ int List::insert(Container::Iterator* iter, void* elem, size_t elemSize)
 		previous->next_Node = new_Node;
 		new_Node->next_Node = current;
 
-		new_Node->wdst_Node = wdst_elem; //~ Узел смотрит туда, где находиться его информация в нашей памяти
 	}
 
 	if (head == nullptr)
@@ -158,7 +151,7 @@ void List::remove(Container::Iterator* iter)
 		iter->goToNext();
 	}
 
-	mm->freeMem(current->wdst_Node);
+	mm->freeMem(current->data);
 	mem_Size += current->data_Size;
 
 	delete(current);
@@ -232,3 +225,4 @@ void* List::operator[](const int index)
 		current = current->next_Node;
 	return current->data;
 }
+
