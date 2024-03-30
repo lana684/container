@@ -199,7 +199,7 @@ bool List::Iterator::hasNext()
 }
 void List::Iterator::goToNext()
 {
-	if (hasNext)
+	if (List::Iterator::hasNext())
 		address = address->next_Node;
 	else
 		address = first_elem;
