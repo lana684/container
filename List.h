@@ -25,7 +25,6 @@ class List : public AbstractList
 private:
 	Node* head;
 	int list_Size;
-	MemoryManager *mm;
 
 public:
 	class RangeError
@@ -73,15 +72,15 @@ public:
 	void remove(Container::Iterator* iter);
 	void clear();
 	bool empty();
-	class Iterator : public Container::Iterator
+	class Iterator : public Container::Iterator //перенести в private или в protected GroupList. рассмотреть 
 	{
-	private:
+	private: //в случае переноса всего класса сделать поля public
 		Node* address;
 		Node* first_elem;
 		Node* last_elem;
 		List* lst;
 		
-		bool in_the_end = 0;
+		//bool in_the_end = 0;
 
 	public:
 		Iterator(Node* _head = nullptr);
@@ -90,7 +89,7 @@ public:
 		void goToNext();
 		bool equals(Container::Iterator* right);
 
-		bool end();
+		//bool end(); //аналогично hasNext
 	};
 	/*Iterator begin() {
 		return Iterator(head);

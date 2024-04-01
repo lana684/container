@@ -1,15 +1,14 @@
 #include "List.h"
 
-size_t mem_Size = -1;
+//size_t mem_Size = -1;
 
 
 List::List(MemoryManager& mem) : AbstractList(mem)
 {
 	head = nullptr;
 	list_Size = 0;
-	mm = &mem;
-	if (mem_Size < 0)
-		mem_Size = mm->size();
+	//if (mem_Size < 0)
+	//	mem_Size = _memory.size();
 }
 
 List::~List()
@@ -23,9 +22,11 @@ int List::push_front(void* elem, size_t elemSize)
 	//выделение памяти из memory оформить как метод list
 	//можно в node, но тогда каждая нода должна знать memory manager
 
-	if (mem_Size - elemSize < 0) throw List::Empty("Net bolshe pamaty");
-	mem_Size -= elemSize;
-	void* wdst_elem = mm->allocMem(elemSize);
+	/*if (mem_Size - elemSize < 0) throw List::Empty("Net bolshe pamaty");
+	mem_Size -= elemSize;*/ //необязательно работать с этим. не моя работа. убрать все mem_size
+	void* wdst_elem = _memory.allocMem(elemSize);
+	//провекрка с помощью maxBytes
+
 
 	memcpy(wdst_elem, elem, elemSize); //~ копирование данных в выделенную нам область памяти
 
@@ -35,7 +36,7 @@ int List::push_front(void* elem, size_t elemSize)
 		new_Node->next_Node = head;
 		head = new_Node;
 	}
-
+	//вынести заполнение ноды в груплист
 	if (head == nullptr)
 		return 1;
 
@@ -49,8 +50,8 @@ void List::pop_front()
 	if (head == nullptr) throw List::Empty("Head is absent");
 	Node* point_tmp = head;
 
-	mm->freeMem(point_tmp->data);
-	mem_Size += point_tmp->data_Size;
+	_memory.freeMem(point_tmp->data);/*
+	mem_Size += point_tmp->data_Size;*/
 
 	head = head->next_Node;
 	delete point_tmp;
@@ -67,9 +68,9 @@ void* List::front(size_t&)
 //+? вставка по итератору
 int List::insert(Container::Iterator* iter, void* elem, size_t elemSize)
 {
-	if (mem_Size - elemSize < 0) throw List::Empty("Net bolshe pamaty");
-	mem_Size -= elemSize;
-	void* wdst_elem = mm->allocMem(elemSize);
+	/*if (mem_Size - elemSize < 0) throw List::Empty("Net bolshe pamaty");
+	mem_Size -= elemSize;*/
+	void* wdst_elem = _memory.allocMem(elemSize);
 
 	memcpy(wdst_elem, elem, elemSize); //~ копирование данных в выделенную нам область памяти
 
@@ -93,7 +94,6 @@ int List::insert(Container::Iterator* iter, void* elem, size_t elemSize)
 
 	list_Size++;
 	return 0;
-	return 0;
 }
 
 //+ выводит количество элементов в списке
@@ -105,7 +105,7 @@ int List::size()
 //+ возвращает максимально доступное количсетво памяти у менеджера памяти
 size_t List::max_bytes()
 {
-	return  mm->size();
+	return  _memory.size();
 }
 
 //+ на выход приходит итератор указывающий на первый элемент в списке который содержит elem
@@ -151,8 +151,8 @@ void List::remove(Container::Iterator* iter)
 		iter->goToNext();
 	}
 
-	mm->freeMem(current->data);
-	mem_Size += current->data_Size;
+	_memory.freeMem(current->data);/*
+	mem_Size += current->data_Size;*/
 
 	delete(current);
 }
@@ -187,13 +187,13 @@ bool List::Iterator::hasNext()
 {
 	if (address->next_Node == nullptr)
 	{
-		in_the_end = 1;
+		//in_the_end = 1;
 		return false;
 	}
 	else
 	{
-		if (address != first_elem)
-			in_the_end = 0;
+		/*if (address != first_elem)
+			in_the_end = 0;*/
 		return true;
 	}
 }
@@ -212,10 +212,10 @@ bool List::Iterator::equals(Container::Iterator* right)
 		return true;
 	return 0;
 }
-bool List::Iterator::end()
-{
-	return in_the_end;
-}
+//bool List::Iterator::end()
+//{
+//	return in_the_end;
+//}
 
 void* List::operator[](const int index)
 {
