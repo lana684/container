@@ -7,8 +7,6 @@ List::List(MemoryManager& mem) : AbstractList(mem)
 {
 	head = nullptr;
 	list_Size = 0;
-	//if (mem_Size < 0)
-	//	mem_Size = _memory.size();
 }
 
 List::~List()
@@ -22,8 +20,6 @@ int List::push_front(void* elem, size_t elemSize)
 	//выделение памяти из memory оформить как метод list
 	//можно в node, но тогда каждая нода должна знать memory manager
 
-	/*if (mem_Size - elemSize < 0) throw List::Empty("Net bolshe pamaty");
-	mem_Size -= elemSize;*/ //необязательно работать с этим. не моя работа. убрать все mem_size
 	void* wdst_elem = _memory.allocMem(elemSize);
 	//провекрка с помощью maxBytes
 
@@ -47,11 +43,10 @@ int List::push_front(void* elem, size_t elemSize)
 //+ удаление элемента из начала списка
 void List::pop_front()
 {
-	if (head == nullptr) throw List::Empty("Head is absent");
+	if (head == nullptr) throw List::Error("Head is absent");
 	Node* point_tmp = head;
 
-	_memory.freeMem(point_tmp->data);/*
-	mem_Size += point_tmp->data_Size;*/
+	_memory.freeMem(point_tmp->data);
 
 	head = head->next_Node;
 	delete point_tmp;
@@ -61,15 +56,13 @@ void List::pop_front()
 //+ возврат указателя на первый элемент списка
 void* List::front(size_t&)
 {
-	if (head == nullptr) throw List::Empty("Head is absent");
+	if (head == nullptr) throw List::Error("Head is absent");
 	return head;
 }
 
 //+? вставка по итератору
 int List::insert(Container::Iterator* iter, void* elem, size_t elemSize)
 {
-	/*if (mem_Size - elemSize < 0) throw List::Empty("Net bolshe pamaty");
-	mem_Size -= elemSize;*/
 	void* wdst_elem = _memory.allocMem(elemSize);
 
 	memcpy(wdst_elem, elem, elemSize); //~ копирование данных в выделенную нам область памяти
@@ -139,7 +132,7 @@ void List::remove(Container::Iterator* iter)
 		previous = current;
 		current = current->next_Node;
 	}
-	if (current == nullptr) throw List::Empty("No elem");
+	if (current == nullptr) throw List::Error("No elem");
 	if (iter->hasNext() == 0)
 	{
 		previous->next_Node = nullptr;
@@ -151,8 +144,7 @@ void List::remove(Container::Iterator* iter)
 		iter->goToNext();
 	}
 
-	_memory.freeMem(current->data);/*
-	mem_Size += current->data_Size;*/
+	_memory.freeMem(current->data);
 
 	delete(current);
 }
@@ -186,16 +178,9 @@ void* List::Iterator::getElement(size_t& size)
 bool List::Iterator::hasNext()
 {
 	if (address->next_Node == nullptr)
-	{
-		//in_the_end = 1;
 		return false;
-	}
 	else
-	{
-		/*if (address != first_elem)
-			in_the_end = 0;*/
 		return true;
-	}
 }
 void List::Iterator::goToNext()
 {
@@ -212,10 +197,6 @@ bool List::Iterator::equals(Container::Iterator* right)
 		return true;
 	return 0;
 }
-//bool List::Iterator::end()
-//{
-//	return in_the_end;
-//}
 
 void* List::operator[](const int index)
 {

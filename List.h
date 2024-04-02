@@ -10,7 +10,7 @@ class Node
 	size_t data_Size;
 
 	
-
+protected:
 	Node(void* _data, size_t _data_Size, Node* _next_Node = nullptr)
 	{
 
@@ -38,11 +38,11 @@ public:
 			cout << "invalid index" << this->index << endl;
 		}
 	};
-	class Empty
+	class Error
 	{
 	public:
 		char msg[256];
-		Empty(const char* err_msg)
+		Error(const char* err_msg)
 		{
 			strcpy(msg, err_msg);
 			cout << msg << endl;
