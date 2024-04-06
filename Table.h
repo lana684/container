@@ -1,74 +1,96 @@
-#pragma once
-#include "TableAbstract.h"
 
-class Table: public AbstractTable
+#pragma once
+#include "TreeAbstract.h"
+//#include "list.h"
+#include <list>
+
+class Node
+{
+	Node* next;
+	Node* prev;
+	void* data;
+	size_t data_Size;
+
+
+public:
+	Node* get_next() { return next; }
+	Node* get_prev() { return prev; }
+	void* get_data() { return data; }
+	void set_data(void* _data) { data = _data; }
+	Node(void* _data, size_t _data_Size, Node* _next = nullptr, Node* _prev=nullptr)
+	{
+		data = _data;
+		data_Size = _data_Size;
+		next = _next;
+		prev = _prev;
+	}
+};
+class my_Node
 {
 public:
-    Table(MemoryManager& mem) : AbstractTable(mem){}
+	void* data;
+	size_t size;
+	Node* parent;
+	Node* me;
+	list<Node>* list_me;
+	list<Node>* child;
+	//my_Node(void* _data, size_t _size, Node* _parent, Node* _me, list<Node>* _child=nullptr): data(_data), size(_size), parent(_parent), me(_me), child(_child) {}
+};
+class Tree :public AbstractTree
+{
+private:
 
-    class Iterator: public Container::Iterator
-    {
-    public:
-        // Возврашает явно указатель на элемент, на который указывает итератор в данный момент.
-        // Неявно возвращает размер данных.
-        // Если итератор показывает за пределы контейнера (например, удален последний элемент), возвращает NULL.
-        virtual void* getElement(size_t& size) override;
+	list<Node>* root; // СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РґРІСѓСЃРІСЏР·Р°РЅРЅС‹Р№ СЃРїРёСЃРѕРє РґРІСѓСЃРІСЏР·Р°РЅРЅС‹С… СЃРїРёСЃРєРѕРІ
+	//List2* mylist;
+	int count_of_elements;
 
-        // Возвращает true, если есть следующий элемент, иначе false.
-        virtual bool hasNext() override;
+	MemoryManager* mm;
+public:
+	class Iterator : public AbstractTree::Iterator
+	{
+		//list<my_Node>* it;
+		my_Node* it;
+		//list<my_Node>* it_list;
+		//list<my_Node>* Node_list;
+		//my_Node* Node;
+	public:
+		//Iterator(list<my_Node>* x) :it(x) {}
+		//////////Iterator(list<list<my_Node>>* x) :it(x) {}
+		//list<my_Node>* get_it() { return it; }
+		//////////list<list<my_Node>>* get_it() { return it; }
+		void set_it(my_Node* _it) { it = _it; }
+		my_Node* get_it() { return it; }
+		//void set_it_list(list<my_Node>* _it_list) { it_list = _it_list; }
+		//void set_Node(my_Node* _Node) { Node = _Node; }
+		//void set_Node_list(list<my_Node>* _Node_list) { Node_list = _Node_list; }
+		//////////void set_element(list<list<my_Node>>* it) { this->it = it; }
+		bool goToParent();
+		bool goToChild(int child_index);
+		void* getElement(size_t& size) override;
+		bool hasNext() override;
+		void goToNext() override;
+		bool equals(Container::Iterator* right) override {};
+		bool equals(Iterator* right);
+	};
 
-        // Переход к следующему элементу.
-        virtual void goToNext() override;
+	Iterator* my_it = nullptr;
 
-        // проверка на равенство итераторов
-        virtual bool equals(Container::Iterator* right) override;
+	Tree(MemoryManager& mem);
 
-    };
+	//Tree_Node* get_root() { return root->front(); } 
 
+	int insert(AbstractTree::Iterator* iter, int child_index, void* elem, size_t size) override;
+	bool remove(AbstractTree::Iterator* iter, int leaf_only) override ;
 
-    // Функция возвращает значение, равное количеству элементов в контейнере.
-    virtual int size() override;
+	//int insert(Iterator* iter, int child_index, void* elem, size_t size);
+	//bool remove(Iterator* iter, int leaf_only);
+	int size() override;
+	size_t max_bytes() override;
+	Iterator* find(void* elem, size_t size) override;
+	Iterator* newIterator() override;
 
-    // Функция возвращает значение, равное максимальной вместимости контейнера в байтах.
-    virtual size_t max_bytes() override;
-
-    // Функция создает в динамической памяти итератор, указывающий на первый найденный
-    // в контейнере элемент. Если элемент не найден, возвращается пустой указатель.
-    // Удаление этого итератора должно делаться пользователем с помощью оператора delete.
-    virtual Iterator* find(void* elem, size_t size) override;
-
-    // Функция создает в динамической памяти итератор, указывающий на первый элемент
-    // контейнера. Если контейнер пустой, возвращается нулевой указатель.
-    // Удаление этого итератора должно делаться пользователем с помощью оператора delete.
-    virtual Iterator* newIterator() override;
-
-    // Удаление элемента из позиции, на которую указывает итератор iter.
-    // После удаления итератор указывает на следующий за удаленным элемент.
-    virtual void remove(Container::Iterator* iter) override;
-
-    // Удаление всех элементов из контейнера.
-    virtual void clear() override;
-
-    // Если контейнер пуст возвращает true, иначе false
-    virtual bool empty() override;
-
-    // Добавление элемента в контейнер, с сответствующим ключом.
-    // Если такой ключ уже есть, функция ничего не делает и возвращает 1.
-    // В случае успешного добавления функция возвращает значение 0, в случае неудачи 1.
-    virtual int insertByKey(void* key, size_t keySize, void* elem, size_t elemSize) override;
-
-    // Удаление элемента с сответствующим ключом из контейнера.
-    virtual void removeByKey(void* key, size_t keySize) override;
-
-    // Функция возвращает указатель на итератор, указывающий на найденный в контейнере элемент с сответствующим ключом.
-    // Если элемент не найден, возвращается нулевой указатель.
-    virtual Iterator* findByKey(void* key, size_t keySize) override;
-
-    // доступ к элементу с ключом key
-    virtual void* at(void* key, size_t keySize, size_t& valueSize) override;
-
-    // хэш функция
-    virtual size_t hash_function(void* key, size_t keySize) override;
-    virtual ~Table(){}
-
+	void remove(Container::Iterator* iter) override;
+	void clear() override;
+	bool empty() override;
+	~Tree();
 };
