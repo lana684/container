@@ -23,60 +23,60 @@ protected:
 class List : public AbstractList
 {
 private:
-	Node* head;
-	int list_Size;
+	Node* head; //ссылка на первый элемент в списке
+	int list_Size; //количество элементов в списке
 
 public:
-	class Error
+	class Error //класс для вывода ошибок, если такие будут наблюдаться
 	{
 	public:
-		char msg[256];
+		char msg[256]; //массив, куда будет записана причина ошибки. Запись провожу я
 		Error(const char* err_msg)
 		{
 			strcpy(msg, err_msg);
-			cout << msg << endl;
+			cout << msg << endl; //вывод этого сообщения
 		}
 	};
 
-	List(MemoryManager& mem);
+	List(MemoryManager& mem); //конструктор
 
-	~List();
+	~List(); //деструктор
 
-	Node* get_Head()
+	/*Node* get_Head()
 	{
 		return this->head;
-	}
+	}*/
 
-	//������ �� ListAbstract.h
-	int push_front(void* elem, size_t elemSize);
-	void pop_front();
-	void* front(size_t& size);
-	int insert(Container::Iterator* iter, void* elem, size_t elemSize);
+	//Методы из ListAbstract.h
+	int push_front(void* elem, size_t elemSize); //добавление элемента в начало списка
+	void pop_front(); //удаление элемента из начала списка
+	void* front(size_t& size); //возвращает указатель на первый элемент в списке
+	int insert(Container::Iterator* iter, void* elem, size_t elemSize); //добавдение нового элемента по итератору
 
-	//������ �� Container.h
-	int size();
-	size_t max_bytes();
-	Container::Iterator* find(void* elem, size_t size);
-	Container::Iterator* newIterator();
-	void remove(Container::Iterator* iter);
-	void clear();
-	bool empty();
-	class Iterator : public Container::Iterator //��������� � private ��� � protected GroupList. ����������� 
+	////Меотды из Container.h
+	int size(); //возвращает количество элементов
+	size_t max_bytes(); // Функция возвращает значение, равное максимальной вместимости контейнера в байтах
+	Container::Iterator* find(void* elem, size_t size); //создание итератора, который указывает на элемент списка, который содержит в себе elem
+	Container::Iterator* newIterator(); //создание итератора, который указывает на первый элемент списка
+	void remove(Container::Iterator* iter); //Удаление элемента с позиции, на который указывает итератор
+	void clear(); //удаление всех элементов списка
+	bool empty(); //проверка, есть ли в списке элементы или он пустой
+	class Iterator : public Container::Iterator 
 	{
-	private: //� ������ �������� ����� ������ ������� ���� public
+	private: 
 		Node* address;
 		Node* first_elem;
 		Node* last_elem;
 		List* lst;
 
-	public: //������ ��� �� �����. ��� ��� ���������� ����� �������������� ��� ���������� �� container. ��� ��� ��� ������. ����� ����� ��������� node � protected ����� ��� ������ � groupList
+	public: 
 		Iterator(Node* _head = nullptr);
-		void* getElement(size_t& size);
-		bool hasNext();
-		void goToNext();
-		bool equals(Container::Iterator* right);
+		void* getElement(size_t& size); //получение ссылки на объект элемента списка
+		bool hasNext(); //проверка на наличие следующего элемента
+		void goToNext(); //переход к следующему элементу
+		bool equals(Container::Iterator* right); //проверка на совпадение элементов
 
 	};
-	void* operator[](const int index);
+	void* operator[](const int index); //не особо важно
 };
 
