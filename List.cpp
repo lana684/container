@@ -14,19 +14,19 @@ List::~List()
 	while (head != nullptr) pop_front();
 }
 
-//+ äîáàâëåíèå ıëåìåíòà â íà÷àëî ñïèñêà 
+//Ğ´Ğ¾Ğ±Ğ°Ğ²Ğ»ĞµĞ½Ğ¸Ğµ ÑĞ»ĞµĞ¼ĞµĞ½Ñ‚Ğ° Ğ² Ğ½Ğ°Ñ‡Ğ°Ğ»Ğ¾ ÑĞ¿Ğ¸ÑĞºe
 int List::push_front(void* elem, size_t elemSize) 
 {
-	//** - ìîæíî âûíåñòè â groupList
+	//** - Ã¬Ã®Ã¦Ã­Ã® Ã¢Ã»Ã­Ã¥Ã±Ã²Ã¨ Ã¢ groupList
 
-	//âûäåëåíèå ïàìÿòè èç memory îôîğìèòü êàê ìåòîä list
-	//ìîæíî â node, íî òîãäà êàæäàÿ íîäà äîëæíà çíàòü memory manager
+	//Ã¢Ã»Ã¤Ã¥Ã«Ã¥Ã­Ã¨Ã¥ Ã¯Ã Ã¬Ã¿Ã²Ã¨ Ã¨Ã§ memory Ã®Ã´Ã®Ã°Ã¬Ã¨Ã²Ã¼ ÃªÃ Ãª Ã¬Ã¥Ã²Ã®Ã¤ list
+	//Ã¬Ã®Ã¦Ã­Ã® Ã¢ node, Ã­Ã® Ã²Ã®Ã£Ã¤Ã  ÃªÃ Ã¦Ã¤Ã Ã¿ Ã­Ã®Ã¤Ã  Ã¤Ã®Ã«Ã¦Ã­Ã  Ã§Ã­Ã Ã²Ã¼ memory manager
 
 	void* wdst_elem = _memory.allocMem(elemSize);
-	//ïğîâåêğêà ñ ïîìîùüş maxBytes??
+	//Ã¯Ã°Ã®Ã¢Ã¥ÃªÃ°ÃªÃ  Ã± Ã¯Ã®Ã¬Ã®Ã¹Ã¼Ã¾ maxBytes??
 
 
-	memcpy(wdst_elem, elem, elemSize);			   //** êîïèğîâàíèå äàííûõ â âûäåëåííóş íàì îáëàñòü ïàìÿòè
+	memcpy(wdst_elem, elem, elemSize);			   //** ÃªÃ®Ã¯Ã¨Ã°Ã®Ã¢Ã Ã­Ã¨Ã¥ Ã¤Ã Ã­Ã­Ã»Ãµ Ã¢ Ã¢Ã»Ã¤Ã¥Ã«Ã¥Ã­Ã­Ã³Ã¾ Ã­Ã Ã¬ Ã®Ã¡Ã«Ã Ã±Ã²Ã¼ Ã¯Ã Ã¬Ã¿Ã²Ã¨
 
 	Node* new_Node = new Node(wdst_elem, elemSize); 
 	if (new_Node != nullptr)                       //**
@@ -34,15 +34,15 @@ int List::push_front(void* elem, size_t elemSize)
 		new_Node->next_Node = head;				   //**
 		head = new_Node;						   //**
 	}										       //**
-												   //âûíåñòè çàïîëíåíèå íîäû â ãğóïëèñò
-	if (head == nullptr)                           //** İòî òàêæå ìîæíî âûíåñòè â ôóêíöèş. Ïóñòü îíà áóäåò âîçâğàùàòü 1 èëè 0. Òîãäà çäåñü äîñòàòî÷íî ïğîïèñàòü return è íàøó ôóíêöèş, â êîòîğóá ìû íàïğàâèì íàøè äàííûå
+												   //Ã¢Ã»Ã­Ã¥Ã±Ã²Ã¨ Ã§Ã Ã¯Ã®Ã«Ã­Ã¥Ã­Ã¨Ã¥ Ã­Ã®Ã¤Ã» Ã¢ Ã£Ã°Ã³Ã¯Ã«Ã¨Ã±Ã²
+	if (head == nullptr)                           //** ÃÃ²Ã® Ã²Ã ÃªÃ¦Ã¥ Ã¬Ã®Ã¦Ã­Ã® Ã¢Ã»Ã­Ã¥Ã±Ã²Ã¨ Ã¢ Ã´Ã³ÃªÃ­Ã¶Ã¨Ã¾. ÃÃ³Ã±Ã²Ã¼ Ã®Ã­Ã  Ã¡Ã³Ã¤Ã¥Ã² Ã¢Ã®Ã§Ã¢Ã°Ã Ã¹Ã Ã²Ã¼ 1 Ã¨Ã«Ã¨ 0. Ã’Ã®Ã£Ã¤Ã  Ã§Ã¤Ã¥Ã±Ã¼ Ã¤Ã®Ã±Ã²Ã Ã²Ã®Ã·Ã­Ã® Ã¯Ã°Ã®Ã¯Ã¨Ã±Ã Ã²Ã¼ return Ã¨ Ã­Ã Ã¸Ã³ Ã´Ã³Ã­ÃªÃ¶Ã¨Ã¾, Ã¢ ÃªÃ®Ã²Ã®Ã°Ã³Ã¡ Ã¬Ã» Ã­Ã Ã¯Ã°Ã Ã¢Ã¨Ã¬ Ã­Ã Ã¸Ã¨ Ã¤Ã Ã­Ã­Ã»Ã¥
 		return 1;                                  //**
 
 	list_Size++;								   //**
 	return 0;									   //**
 } 
 
-//+ óäàëåíèå ıëåìåíòà èç íà÷àëà ñïèñêà
+//+ Ã³Ã¤Ã Ã«Ã¥Ã­Ã¨Ã¥ Ã½Ã«Ã¥Ã¬Ã¥Ã­Ã²Ã  Ã¨Ã§ Ã­Ã Ã·Ã Ã«Ã  Ã±Ã¯Ã¨Ã±ÃªÃ 
 void List::pop_front()
 {
 	if (head == nullptr) throw List::Error("Head is absent");
@@ -55,19 +55,19 @@ void List::pop_front()
 	list_Size--;
 }
 
-//+ âîçâğàò óêàçàòåëÿ íà ïåğâûé ıëåìåíò ñïèñêà
+//+ Ã¢Ã®Ã§Ã¢Ã°Ã Ã² Ã³ÃªÃ Ã§Ã Ã²Ã¥Ã«Ã¿ Ã­Ã  Ã¯Ã¥Ã°Ã¢Ã»Ã© Ã½Ã«Ã¥Ã¬Ã¥Ã­Ã² Ã±Ã¯Ã¨Ã±ÃªÃ 
 void* List::front(size_t&)
 {
 	if (head == nullptr) throw List::Error("Head is absent");
 	return head;
 }
 
-//+? âñòàâêà ïî èòåğàòîğó
+//+? Ã¢Ã±Ã²Ã Ã¢ÃªÃ  Ã¯Ã® Ã¨Ã²Ã¥Ã°Ã Ã²Ã®Ã°Ã³
 int List::insert(Container::Iterator* iter, void* elem, size_t elemSize)
 {
 	void* wdst_elem = _memory.allocMem(elemSize);
 
-	memcpy(wdst_elem, elem, elemSize); //~ êîïèğîâàíèå äàííûõ â âûäåëåííóş íàì îáëàñòü ïàìÿòè
+	memcpy(wdst_elem, elem, elemSize); //~ ÃªÃ®Ã¯Ã¨Ã°Ã®Ã¢Ã Ã­Ã¨Ã¥ Ã¤Ã Ã­Ã­Ã»Ãµ Ã¢ Ã¢Ã»Ã¤Ã¥Ã«Ã¥Ã­Ã­Ã³Ã¾ Ã­Ã Ã¬ Ã®Ã¡Ã«Ã Ã±Ã²Ã¼ Ã¯Ã Ã¬Ã¿Ã²Ã¨
 
 	Node* new_Node = new Node(wdst_elem, elemSize);
 	if (new_Node != nullptr)
@@ -91,19 +91,19 @@ int List::insert(Container::Iterator* iter, void* elem, size_t elemSize)
 	return 0;
 }
 
-//+ âûâîäèò êîëè÷åñòâî ıëåìåíòîâ â ñïèñêå
+//+ Ã¢Ã»Ã¢Ã®Ã¤Ã¨Ã² ÃªÃ®Ã«Ã¨Ã·Ã¥Ã±Ã²Ã¢Ã® Ã½Ã«Ã¥Ã¬Ã¥Ã­Ã²Ã®Ã¢ Ã¢ Ã±Ã¯Ã¨Ã±ÃªÃ¥
 int List::size()
 {
 	return list_Size;
 }
 
-//+ âîçâğàùàåò ìàêñèìàëüíî äîñòóïíîå êîëè÷ñåòâî ïàìÿòè ó ìåíåäæåğà ïàìÿòè
+//+ Ã¢Ã®Ã§Ã¢Ã°Ã Ã¹Ã Ã¥Ã² Ã¬Ã ÃªÃ±Ã¨Ã¬Ã Ã«Ã¼Ã­Ã® Ã¤Ã®Ã±Ã²Ã³Ã¯Ã­Ã®Ã¥ ÃªÃ®Ã«Ã¨Ã·Ã±Ã¥Ã²Ã¢Ã® Ã¯Ã Ã¬Ã¿Ã²Ã¨ Ã³ Ã¬Ã¥Ã­Ã¥Ã¤Ã¦Ã¥Ã°Ã  Ã¯Ã Ã¬Ã¿Ã²Ã¨
 size_t List::max_bytes()
 {
 	return  _memory.size();
 }
 
-//+ íà âûõîä ïğèõîäèò èòåğàòîğ óêàçûâàşùèé íà ïåğâûé ıëåìåíò â ñïèñêå êîòîğûé ñîäåğæèò elem
+//+ Ã­Ã  Ã¢Ã»ÃµÃ®Ã¤ Ã¯Ã°Ã¨ÃµÃ®Ã¤Ã¨Ã² Ã¨Ã²Ã¥Ã°Ã Ã²Ã®Ã° Ã³ÃªÃ Ã§Ã»Ã¢Ã Ã¾Ã¹Ã¨Ã© Ã­Ã  Ã¯Ã¥Ã°Ã¢Ã»Ã© Ã½Ã«Ã¥Ã¬Ã¥Ã­Ã² Ã¢ Ã±Ã¯Ã¨Ã±ÃªÃ¥ ÃªÃ®Ã²Ã®Ã°Ã»Ã© Ã±Ã®Ã¤Ã¥Ã°Ã¦Ã¨Ã² elem
 Container::Iterator* List::find(void* elem, size_t size)
 {
 	Node* tmp = (Node*)front(head->data_Size);
@@ -117,14 +117,14 @@ Container::Iterator* List::find(void* elem, size_t size)
 	return it;
 }
 
-//+ ñîçäàíèå íîâãî èòåğàòîğà, êîòîğûé óêàçûâàåò èçíà÷àëüíî íà head
+//+ Ã±Ã®Ã§Ã¤Ã Ã­Ã¨Ã¥ Ã­Ã®Ã¢Ã£Ã® Ã¨Ã²Ã¥Ã°Ã Ã²Ã®Ã°Ã , ÃªÃ®Ã²Ã®Ã°Ã»Ã© Ã³ÃªÃ Ã§Ã»Ã¢Ã Ã¥Ã² Ã¨Ã§Ã­Ã Ã·Ã Ã«Ã¼Ã­Ã® Ã­Ã  head
 Container::Iterator* List::newIterator()
 {
 	List::Iterator* it = new List::Iterator(this->head);
 	return it;	
 }
 
-//+ óäàëåíèå ıëåìåíòà ñïèñêà íà êîòîğûé óêàçûâàåò èòåğàòîğ
+//+ Ã³Ã¤Ã Ã«Ã¥Ã­Ã¨Ã¥ Ã½Ã«Ã¥Ã¬Ã¥Ã­Ã²Ã  Ã±Ã¯Ã¨Ã±ÃªÃ  Ã­Ã  ÃªÃ®Ã²Ã®Ã°Ã»Ã© Ã³ÃªÃ Ã§Ã»Ã¢Ã Ã¥Ã² Ã¨Ã²Ã¥Ã°Ã Ã²Ã®Ã°
 void List::remove(Container::Iterator* iter)
 {
 	Node* current = head;
@@ -150,12 +150,12 @@ void List::remove(Container::Iterator* iter)
 
 	delete(current);
 }
-//+ óäàëåíèå âñåõ ıëåìåíòîâ â ñïèñêå
-void List::clear() //+ âğîäå ğàáîòàåò. Óäàëÿåò 
+//+ Ã³Ã¤Ã Ã«Ã¥Ã­Ã¨Ã¥ Ã¢Ã±Ã¥Ãµ Ã½Ã«Ã¥Ã¬Ã¥Ã­Ã²Ã®Ã¢ Ã¢ Ã±Ã¯Ã¨Ã±ÃªÃ¥
+void List::clear() //+ Ã¢Ã°Ã®Ã¤Ã¥ Ã°Ã Ã¡Ã®Ã²Ã Ã¥Ã². Ã“Ã¤Ã Ã«Ã¿Ã¥Ã² 
 {
 	while (head != nullptr) pop_front();
 }
-//+ ïğîâåğêà íà íàëè÷èå ıëåìåíòîâ â ñïèñêå
+//+ Ã¯Ã°Ã®Ã¢Ã¥Ã°ÃªÃ  Ã­Ã  Ã­Ã Ã«Ã¨Ã·Ã¨Ã¥ Ã½Ã«Ã¥Ã¬Ã¥Ã­Ã²Ã®Ã¢ Ã¢ Ã±Ã¯Ã¨Ã±ÃªÃ¥
 bool List::empty() //+
 {
 	if (head != nullptr)
@@ -164,7 +164,7 @@ bool List::empty() //+
 		return true;
 }
 
-//ìåòîäû èòåğàòîğà
+//Ã¬Ã¥Ã²Ã®Ã¤Ã» Ã¨Ã²Ã¥Ã°Ã Ã²Ã®Ã°Ã 
 List::Iterator::Iterator(Node* _head) //+
 {
 	this->address = _head;
