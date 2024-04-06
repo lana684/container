@@ -15,29 +15,31 @@ List::~List()
 }
 
 //+ добавление элемента в начало списка 
-int List::push_front(void* elem, size_t elemSize)
+int List::push_front(void* elem, size_t elemSize) 
 {
+	//** - можно вынести в groupList
+
 	//выделение памяти из memory оформить как метод list
 	//можно в node, но тогда каждая нода должна знать memory manager
 
 	void* wdst_elem = _memory.allocMem(elemSize);
-	//провекрка с помощью maxBytes
+	//провекрка с помощью maxBytes??
 
 
-	memcpy(wdst_elem, elem, elemSize); //~ копирование данных в выделенную нам область памяти
+	memcpy(wdst_elem, elem, elemSize);			   //** копирование данных в выделенную нам область памяти
 
 	Node* new_Node = new Node(wdst_elem, elemSize); 
-	if (new_Node != nullptr)
-	{
-		new_Node->next_Node = head;
-		head = new_Node;
-	}
-	//вынести заполнение ноды в груплист
-	if (head == nullptr)
-		return 1;
+	if (new_Node != nullptr)                       //**
+	{											   //**
+		new_Node->next_Node = head;				   //**
+		head = new_Node;						   //**
+	}										       //**
+												   //вынести заполнение ноды в груплист
+	if (head == nullptr)                           //** Это также можно вынести в фукнцию. Пусть она будет возвращать 1 или 0. Тогда здесь достаточно прописать return и нашу функцию, в которуб мы направим наши данные
+		return 1;                                  //**
 
-	list_Size++;
-	return 0;
+	list_Size++;								   //**
+	return 0;									   //**
 } 
 
 //+ удаление элемента из начала списка
@@ -149,21 +151,21 @@ void List::remove(Container::Iterator* iter)
 	delete(current);
 }
 //+ удаление всех элементов в списке
-void List::clear()
+void List::clear() //+ вроде работает. Удаляет 
 {
 	while (head != nullptr) pop_front();
 }
 //+ проверка на наличие элементов в списке
-bool List::empty()
+bool List::empty() //+
 {
 	if (head != nullptr)
 		return false;
 	else
-		return false;
+		return true;
 }
 
 //методы итератора
-List::Iterator::Iterator(Node* _head)
+List::Iterator::Iterator(Node* _head) //+
 {
 	this->address = _head;
 	this->first_elem = _head;
@@ -171,36 +173,35 @@ List::Iterator::Iterator(Node* _head)
 	while (last_elem->next_Node != nullptr)
 		last_elem = last_elem->next_Node;
 }
-void* List::Iterator::getElement(size_t& size)
+void* List::Iterator::getElement(size_t& size) //+
 {
 	return address->data;
 }
-bool List::Iterator::hasNext()
+bool List::Iterator::hasNext() //+
 {
 	if (address->next_Node == nullptr)
 		return false;
 	else
 		return true;
 }
-void List::Iterator::goToNext()
+void List::Iterator::goToNext() //+
 {
 	if (List::Iterator::hasNext())
 		address = address->next_Node;
 	else
 		address = first_elem;
 }
-bool List::Iterator::equals(Container::Iterator* right)
+bool List::Iterator::equals(Container::Iterator* right) //+
 {
 	if (address->data != right->getElement(address->data_Size))
 		return false;
 	else
 		return true;
-	return 0;
 }
 
 void* List::operator[](const int index)
 {
-	if (index < 0 || index >= list_Size) throw RangeError(index);
+	if (index < 0 || index >= list_Size) throw Error("Out of range");
 	Node* current = this->head;
 	for (int i = 0; i < index; i++)
 		current = current->next_Node;

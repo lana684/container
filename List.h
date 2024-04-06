@@ -27,17 +27,6 @@ private:
 	int list_Size;
 
 public:
-	class RangeError
-	{
-	private:
-		int index;
-	public:
-		RangeError(int _index) : index(_index) {}
-		void out_of_range()
-		{
-			cout << "invalid index" << this->index << endl;
-		}
-	};
 	class Error
 	{
 	public:
@@ -79,24 +68,15 @@ public:
 		Node* first_elem;
 		Node* last_elem;
 		List* lst;
-		
-		//bool in_the_end = 0;
 
-	public:
+	public: //методы тут не нужны. “ак как реализаци€ будет восприниматьс€ как реализаци€ из container. так как они похожи. “огда можно перенести node в protected листа или вообще в groupList
 		Iterator(Node* _head = nullptr);
 		void* getElement(size_t& size);
 		bool hasNext();
 		void goToNext();
 		bool equals(Container::Iterator* right);
 
-		//bool end(); //аналогично hasNext
 	};
-	/*Iterator begin() {
-		return Iterator(head);
-	}
-	Iterator end() {
-		return Iterator(nullptr);
-	}*/
 	void* operator[](const int index);
 };
 
