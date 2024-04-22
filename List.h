@@ -24,7 +24,9 @@ class List : public AbstractList
 {
 private:
 	Node* head; //ссылка на первый элемент в списке
-	int list_Size; // количество элементов в списке 
+	size_t list_Size; // количество элементов в списке 
+
+	size_t mem_Size_List;
 
 public:
 	class Error //класс вывода ошибок, если такие будут наблюдаться
@@ -76,6 +78,5 @@ public:
 		void goToNext();//переход к следующему элементу 
 		bool equals(Container::Iterator* right); //проверка на совпадение элементов
 	};
-	void* operator[](const int index);
 };
 
