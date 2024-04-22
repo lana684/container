@@ -38,12 +38,13 @@ int List::push_front(void* elem, size_t elemSize)
 	if (head == nullptr)                           //** Это также можно вынести в фукнцию. Пусть она будет возвращать 1 или 0. Тогда здесь достаточно прописать return и нашу функцию, в которуб мы направим наши данные
 		return 1;                                  //**
 
+	mem_Size_List += elemSize;
 	list_Size++;								   //**
 	return 0;									   //**
 } 
 
 //+ удаление элемента из начала списка
-void List::pop_front() //+
+void List::pop_front()
 {
 	if (head == nullptr) throw List::Error("Head is absent");
 	Node* point_tmp = head;
@@ -53,6 +54,8 @@ void List::pop_front() //+
 	head = head->next_Node;
 	delete point_tmp;
 	list_Size--;
+
+	mem_Size_List -= point_tmp->data_Size;
 }
 
 //+ возврат указателя на первый элемент списка
@@ -87,6 +90,7 @@ int List::insert(Container::Iterator* iter, void* elem, size_t elemSize)
 	if (head == nullptr)
 		return 1;
 
+	mem_Size_List += elemSize;
 	list_Size++;
 	return 0;
 }
@@ -151,7 +155,9 @@ void List::remove(Container::Iterator* iter) //+
 		iter->goToNext();
 	}
 
+	this->mem_Size_List -= current->data_Size;
 	this->list_Size--;
+	
 	_memory.freeMem(current->data);
 
 	delete(current);
@@ -205,6 +211,5 @@ bool List::Iterator::equals(Container::Iterator* right) //+
 	else
 		return true;
 }
-
 
 
