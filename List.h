@@ -28,6 +28,8 @@ private:
 
 	size_t mem_Size_List;
 
+	void* allocate_space(size_t elem_size);
+
 public:
 	class Error //класс вывода ошибок, если такие будут наблюдаться
 	{
@@ -44,26 +46,21 @@ public:
 
 	~List();//деструктор List
 
-	/*Node* get_Head()
-	{
-		return this->head;
-	}*/
-
 	//Методы из ListAbstract.h
-	int push_front(void* elem, size_t elemSize); //добавление элемента в начало списка
-	void pop_front();//удаление элемента из начала списка 
-	void* front(size_t& size);//возвращает указатель на первый элемент в списке
-	int insert(Container::Iterator* iter, void* elem, size_t elemSize);//добавление нового элемента по итератору
+	int push_front(void* elem, size_t elemSize);						//добавление элемента в начало списка
+	void pop_front();													//удаление элемента из начала списка 
+	void* front(size_t& size);											//возвращает указатель на первый элемент в списке
+	int insert(Container::Iterator* iter, void* elem, size_t elemSize); //добавление нового элемента по итератору
 
 	//Меотды из Container.h
-	int size(); //возвращет количество элементов в списке 
-	size_t max_bytes();//Функция возвращает значение, равное максимальной вместимости контейнера в байтах
-	Container::Iterator* find(void* elem, size_t size); //создание итератора, который указывает на элемент списка, который содержит в себе elem 
-	Container::Iterator* newIterator();// создание итератора, который указывает на первый элемент в списке
-	void remove(Container::Iterator* iter); //Удаление элемента с позиции на который указывает итератор
-	void clear(); //удаление всех элементов в списке
-	bool empty();//проверка на наличие элементов в списке
-	class Iterator : public Container::Iterator //перенести в private или в protected GroupList. рассмотреть 
+	int size();                                                   //возвращет количество элементов в списке 
+	size_t max_bytes();                                           //Функция возвращает значение, равное максимальной вместимости контейнера в байтах
+	Container::Iterator* find(void* elem, size_t size);           //создание итератора, который указывает на элемент списка, который содержит в себе elem 
+	Container::Iterator* newIterator();                           // создание итератора, который указывает на первый элемент в списке
+	void remove(Container::Iterator* iter);                       //Удаление элемента с позиции на который указывает итератор
+	void clear();												  //удаление всех элементов в списке
+	bool empty();												  //проверка на наличие элементов в списке
+	class Iterator : public Container::Iterator					  //перенести в private или в protected GroupList. рассмотреть 
 	{
 	private: //в случае переноса всего класса сделать поля public
 		Node* address;
