@@ -1,10 +1,9 @@
-#include "List.h"
+ï»¿#include "List.h"
 
 List::List(MemoryManager& mem) : AbstractList(mem)
 {
 	head = nullptr;
 	list_Size = 0;
-	mm = &mem;
 }
 
 List::~List()
@@ -12,128 +11,222 @@ List::~List()
 	while (head != nullptr) pop_front();
 }
 
-//+ äîáàâëåíèå ıëåìåíòà â íà÷àëî ñïèñêà 
-int List::push_front(void* elem, size_t elemSize)
+//+ Ğ´Ğ¾Ğ±Ğ°Ğ²Ğ»ĞµĞ½Ğ¸Ğµ ÑĞ»ĞµĞ¼ĞµĞ½Ñ‚Ğ° Ğ² Ğ½Ğ°Ñ‡Ğ°Ğ»Ğ¾ ÑĞ¿Ğ¸ÑĞºĞ° 
+int List::push_front(void* elem, size_t elemSize) //+
+{
+	//Ğ²Ñ‹Ğ´ĞµĞ»ĞµĞ½Ğ¸Ğµ Ğ¿Ğ°Ğ¼ÑÑ‚Ğ¸ Ğ¸Ğ· memory Ğ¾Ñ„Ğ¾Ñ€Ğ¼Ğ¸Ñ‚ÑŒ ĞºĞ°Ğº Ğ¼ĞµÑ‚Ğ¾Ğ´ list
+	//Ğ¼Ğ¾Ğ¶Ğ½Ğ¾ Ğ² node, Ğ½Ğ¾ Ñ‚Ğ¾Ğ³Ğ´Ğ° ĞºĞ°Ğ¶Ğ´Ğ°Ñ Ğ½Ğ¾Ğ´Ğ° Ğ´Ğ¾Ğ»Ğ¶Ğ½Ğ° Ğ·Ğ½Ğ°Ñ‚ÑŒ memory manager
+
+	//Ğ¿Ñ€Ğ¾Ğ²ĞµĞºÑ€ĞºĞ° Ñ Ğ¿Ğ¾Ğ¼Ğ¾Ñ‰ÑŒÑ maxBytes??
+
+	//int n = filling_a_node(wdst_elem, elem, elemSize, this->head);
+
+	void* wdst_elem = _memory.allocMem(elemSize);
+	memcpy(wdst_elem, elem, elemSize);			   //** ĞºĞ¾Ğ¿Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ¸Ğµ Ğ´Ğ°Ğ½Ğ½Ñ‹Ñ… Ğ² Ğ²Ñ‹Ğ´ĞµĞ»ĞµĞ½Ğ½ÑƒÑ Ğ½Ğ°Ğ¼ Ğ¾Ğ±Ğ»Ğ°ÑÑ‚ÑŒ Ğ¿Ğ°Ğ¼ÑÑ‚Ğ¸
+
+	Node* new_Node = new Node(wdst_elem, elemSize);//**
+	if (new_Node != nullptr)                       //**
+	{											   //**
+		new_Node->next_Node = head;				   //**
+		head = new_Node;						   //**
+	}										       //**
+												   //Ğ²Ñ‹Ğ½ĞµÑÑ‚Ğ¸ Ğ·Ğ°Ğ¿Ğ¾Ğ»Ğ½ĞµĞ½Ğ¸Ğµ Ğ½Ğ¾Ğ´Ñ‹ Ğ² Ğ³Ñ€ÑƒĞ¿Ğ»Ğ¸ÑÑ‚
+	if (head == nullptr)                           //** Ğ­Ñ‚Ğ¾ Ñ‚Ğ°ĞºĞ¶Ğµ Ğ¼Ğ¾Ğ¶Ğ½Ğ¾ Ğ²Ñ‹Ğ½ĞµÑÑ‚Ğ¸ Ğ² Ñ„ÑƒĞºĞ½Ñ†Ğ¸Ñ. ĞŸÑƒÑÑ‚ÑŒ Ğ¾Ğ½Ğ° Ğ±ÑƒĞ´ĞµÑ‚ Ğ²Ğ¾Ğ·Ğ²Ñ€Ğ°Ñ‰Ğ°Ñ‚ÑŒ 1 Ğ¸Ğ»Ğ¸ 0. Ğ¢Ğ¾Ğ³Ğ´Ğ° Ğ·Ğ´ĞµÑÑŒ Ğ´Ğ¾ÑÑ‚Ğ°Ñ‚Ğ¾Ñ‡Ğ½Ğ¾ Ğ¿Ñ€Ğ¾Ğ¿Ğ¸ÑĞ°Ñ‚ÑŒ return Ğ¸ Ğ½Ğ°ÑˆÑƒ Ñ„ÑƒĞ½ĞºÑ†Ğ¸Ñ, Ğ² ĞºĞ¾Ñ‚Ğ¾Ñ€ÑƒĞ± Ğ¼Ñ‹ Ğ½Ğ°Ğ¿Ñ€Ğ°Ğ²Ğ¸Ğ¼ Ğ½Ğ°ÑˆĞ¸ Ğ´Ğ°Ğ½Ğ½Ñ‹Ğµ
+		return 1;                                  //**
+
+	mem_Size_List += elemSize;
+	list_Size++;								   //**
+	return 0;									   //**
+}
+
+//+ ÑƒĞ´Ğ°Ğ»ĞµĞ½Ğ¸Ğµ ÑĞ»ĞµĞ¼ĞµĞ½Ñ‚Ğ° Ğ¸Ğ· Ğ½Ğ°Ñ‡Ğ°Ğ»Ğ° ÑĞ¿Ğ¸ÑĞºĞ°
+void List::pop_front() //+
+{
+	if (head == nullptr) throw List::Error("Head is absent");
+	Node* point_tmp = head;
+
+	_memory.freeMem(point_tmp->data);
+
+	mem_Size_List -= point_tmp->data_Size;
+	head = head->next_Node;
+	delete point_tmp;
+	list_Size--;
+
+}
+
+//+ Ğ²Ğ¾Ğ·Ğ²Ñ€Ğ°Ñ‚ ÑƒĞºĞ°Ğ·Ğ°Ñ‚ĞµĞ»Ñ Ğ½Ğ° Ğ¿ĞµÑ€Ğ²Ñ‹Ğ¹ ÑĞ»ĞµĞ¼ĞµĞ½Ñ‚ ÑĞ¿Ğ¸ÑĞºĞ°
+void* List::front(size_t&) //+
+{
+	if (head == nullptr) throw List::Error("Head is absent");
+	return head;
+}
+
+//+ Ğ²ÑÑ‚Ğ°Ğ²ĞºĞ° Ğ¿Ğ¾ Ğ¸Ñ‚ĞµÑ€Ğ°Ñ‚Ğ¾Ñ€Ñƒ
+int List::insert(Container::Iterator* iter, void* elem, size_t elemSize) //+
 {
 
-	Node* new_Node = new Node(elem, elemSize);
+	void* wdst_elem = _memory.allocMem(elemSize);
+
+	memcpy(wdst_elem, elem, elemSize); //~ ĞºĞ¾Ğ¿Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ¸Ğµ Ğ´Ğ°Ğ½Ğ½Ñ‹Ñ… Ğ² Ğ²Ñ‹Ğ´ĞµĞ»ĞµĞ½Ğ½ÑƒÑ Ğ½Ğ°Ğ¼ Ğ¾Ğ±Ğ»Ğ°ÑÑ‚ÑŒ Ğ¿Ğ°Ğ¼ÑÑ‚Ğ¸
+
+	Node* new_Node = new Node(wdst_elem, elemSize);
 	if (new_Node != nullptr)
 	{
-		new_Node->next_Node = head;
-		head = new_Node;
-	}
-	//Äîáàâèòü ñúåäàíèå ïàìÿòè ó ìåíåäæåğà ïàìÿòè
+		Node* current = head;
+		Node* previous = nullptr;
+		while (current->data != iter->getElement(elemSize) && current != nullptr)
+		{
+			previous = current;
+			current = current->next_Node;
+		}
+		previous->next_Node = new_Node;
+		new_Node->next_Node = current;
 
-	//ïğè ñîçäàíèè íîâîãî ıëåìåíòà ìû âûäåëÿåì ïàìÿòü âíóòğè íàøåãî ìàññèâà, êàêèì-òî íåîáû÷íûì ñïîñîáîì. Êàê? Ïğèäóìàé ñàì. 
-	//ìû îòäåëÿåì ÷àñòü ïàìÿòè êîòîğóş òğåáóåò íàø íîâûé ıëåìåíò. Â ıòó âûäåëåííóş ÷àñòü ïàìÿòè ìû êîïèğóåì äàííûå. Îòíèìàåì íóæíîå êîëè÷åñòâî ïàìÿòè
+	}
 
 	if (head == nullptr)
 		return 1;
 
+	mem_Size_List += elemSize;
 	list_Size++;
 	return 0;
-} 
-
-//+ óäàëåíèå ıëåìåíòà èç íà÷àëà ñïèñêà
-void List::pop_front()
-{
-	//äîáàâèòü ïğîâåğêó íà íàëè÷èå ıëåìåíòà
-	//äîáàâèòü îáğàáîò÷èê íà äàííîé îøèáêè
-	Node* point_tmp = head;
-	head = head->next_Node;
-	delete point_tmp;
-	list_Size--;
 }
 
-void* List::front(size_t&)
-{
-	//Ñòîèò äîáàâèòü ïğîâåğêó íà íàëè÷èå ıëåìåíòà â ñïèñêå
-	//Ìîæíî èñïîëüçîâàòü îáğàáîò÷èê î êîòîğîì ãîâîğèòñÿ â pop_front
-	return head;
-}
-
-//- âñòàâêà ïî èòåğàòîğó
-int List::insert(Container::Iterator* iter, void* elem, size_t elemSize)
-{
-	return 0;
-}
-
-//+? âûâîäèò êîëè÷åñòâî ıëåìåíòîâ â ñïèñêå
-int List::size()
+//+ Ğ²Ñ‹Ğ²Ğ¾Ğ´Ğ¸Ñ‚ ĞºĞ¾Ğ»Ğ¸Ñ‡ĞµÑÑ‚Ğ²Ğ¾ ÑĞ»ĞµĞ¼ĞµĞ½Ñ‚Ğ¾Ğ² Ğ² ÑĞ¿Ğ¸ÑĞºĞµ
+int List::size() //+
 {
 	return list_Size;
 }
 
-//-? âîçâğàùàåò ìàêñèìàëüíî äîñòóïíîå êîëè÷ñåòâî ïàìÿòè ó ìåíåäæåğà ïàìÿòè
+//+ Ğ²Ğ¾Ğ·Ğ²Ñ€Ğ°Ñ‰Ğ°ĞµÑ‚ Ğ¼Ğ°ĞºÑĞ¸Ğ¼Ğ°Ğ»ÑŒĞ½Ğ¾ Ğ´Ğ¾ÑÑ‚ÑƒĞ¿Ğ½Ğ¾Ğµ ĞºĞ¾Ğ»Ğ¸Ñ‡ÑĞµÑ‚Ğ²Ğ¾ Ğ¿Ğ°Ğ¼ÑÑ‚Ğ¸ Ñƒ Ğ¼ĞµĞ½ĞµĞ´Ğ¶ĞµÑ€Ğ° Ğ¿Ğ°Ğ¼ÑÑ‚Ğ¸
 size_t List::max_bytes()
 {
-	size_t size_memory_manager = size();
-	return size_memory_manager;
+	return  _memory.size();
 }
 
-//- íà âûõîä ïğèõîäèò èòåğàòîğ óêàçûâàşùèé íà ïåğâûé ıëåìåíò â ñïèñêå êîòîğûé ñîäåğæèò elem
-Container::Iterator* List::find(void* elem, size_t size)
+//+ Ğ½Ğ° Ğ²Ñ‹Ñ…Ğ¾Ğ´ Ğ¿Ñ€Ğ¸Ñ…Ğ¾Ğ´Ğ¸Ñ‚ Ğ¸Ñ‚ĞµÑ€Ğ°Ñ‚Ğ¾Ñ€ ÑƒĞºĞ°Ğ·Ñ‹Ğ²Ğ°ÑÑ‰Ğ¸Ğ¹ Ğ½Ğ° Ğ¿ĞµÑ€Ğ²Ñ‹Ğ¹ ÑĞ»ĞµĞ¼ĞµĞ½Ñ‚ Ğ² ÑĞ¿Ğ¸ÑĞºĞµ ĞºĞ¾Ñ‚Ğ¾Ñ€Ñ‹Ğ¹ ÑĞ¾Ğ´ĞµÑ€Ğ¶Ğ¸Ñ‚ elem
+Container::Iterator* List::find(void* elem, size_t size) //+
 {
-	Container::Iterator* it = nullptr;
+
+	List::Iterator* it = new List::Iterator(this);
+	while (memcmp(it->getElement(size), elem, size) != 0)
+	{
+		if (it->hasNext() == 1)
+			it->goToNext();
+		else
+		{
+			delete it;
+			return nullptr;
+		}
+	}
+
 	return it;
 }
 
-//- ñîçäàíèå íîâãî èòåğàòîğà, êîòîğûé óêàçûâàåò èçíà÷àëüíî íà head
-Container::Iterator* List::newIterator()
+//+ ÑĞ¾Ğ·Ğ´Ğ°Ğ½Ğ¸Ğµ Ğ½Ğ¾Ğ²Ğ³Ğ¾ Ğ¸Ñ‚ĞµÑ€Ğ°Ñ‚Ğ¾Ñ€Ğ°, ĞºĞ¾Ñ‚Ğ¾Ñ€Ñ‹Ğ¹ ÑƒĞºĞ°Ğ·Ñ‹Ğ²Ğ°ĞµÑ‚ Ğ¸Ğ·Ğ½Ğ°Ñ‡Ğ°Ğ»ÑŒĞ½Ğ¾ Ğ½Ğ° head
+Container::Iterator* List::newIterator() //+
 {
-	Container::Iterator* it /*= Iterator()*/;
-
-	return it;
+	try 
+	{
+		List::Iterator* it = new List::Iterator(this);
+		return it;
+	}
+	catch (List::Error er)
+	{
+		return nullptr;
+	}
 }
 
-//- óäàëåíèå ıëåìåíòà ñïèñêà íà êîòîğûé óêàçûâàåò èòåğàòîğ
-void List::remove(Container::Iterator* iter)
+//+ ÑƒĞ´Ğ°Ğ»ĞµĞ½Ğ¸Ğµ ÑĞ»ĞµĞ¼ĞµĞ½Ñ‚Ğ° ÑĞ¿Ğ¸ÑĞºĞ° Ğ½Ğ° ĞºĞ¾Ñ‚Ğ¾Ñ€Ñ‹Ğ¹ ÑƒĞºĞ°Ğ·Ñ‹Ğ²Ğ°ĞµÑ‚ Ğ¸Ñ‚ĞµÑ€Ğ°Ñ‚Ğ¾Ñ€
+void List::remove(Container::Iterator* iter) //+
 {
+	//Ğ•ÑĞ»Ğ¸ Ğ¼Ñ‹ ÑƒĞ´Ğ°Ğ»ÑĞµĞ¼ Ğ²ÑĞµ ÑĞ»ĞµĞ¼ĞµĞ½Ñ‚Ñ‹ Ğ² ÑĞ¿Ğ¸ÑĞºĞµ Ğ¸ Ñ…Ğ¾Ñ‚Ğ¸Ğ¼ Ğ²Ğ¾ÑĞ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ÑŒÑÑ Ğ¸Ñ‚ĞµÑ€Ğ°Ñ‚Ğ¾Ñ€Ğ¾Ğ¼, Ñ‚Ğ¾ Ğ¼Ñ‹ Ğ´Ğ¾Ğ»Ğ¶Ğ½Ñ‹ Ğ¿Ñ€Ğ¾ÑÑ‚Ğ¾ Ğ¾Ñ‚Ğ»Ğ¾Ğ²Ğ¸Ñ‚ÑŒ Ğ¾ÑˆĞ¸Ğ±ĞºÑƒ?
+	if (head == nullptr) throw List::Error("Head is empty or iter point to nullptr");
+	Node* current = head;
+	Node* previous = head;
+	while (current->data != iter->getElement(current->data_Size) && current != nullptr)
+	{
+		previous = current;
+		current = current->next_Node;
+	}
+	if (current == nullptr) throw List::Error("No elem");
+	if (iter->hasNext() == 0)
+	{
+		if (current == head)
+			this->head = nullptr;
+		else
+			previous->next_Node = nullptr;
+		iter->goToNext();
+	}
+	else
+	{
+		if (current == head)
+			this->head = current->next_Node;
+		else
+			previous->next_Node = current->next_Node;
+		iter->goToNext();
+	}
 
+	this->mem_Size_List -= current->data_Size;
+	this->list_Size--;
+
+	_memory.freeMem(current->data);
+
+	delete(current);
 }
-//+ óäàëåíèå âñåõ ıëåìåíòîâ â ñïèñêå
-void List::clear()
+//+ ÑƒĞ´Ğ°Ğ»ĞµĞ½Ğ¸Ğµ Ğ²ÑĞµÑ… ÑĞ»ĞµĞ¼ĞµĞ½Ñ‚Ğ¾Ğ² Ğ² ÑĞ¿Ğ¸ÑĞºĞµ
+void List::clear() //+ Ğ²Ñ€Ğ¾Ğ´Ğµ Ñ€Ğ°Ğ±Ğ¾Ñ‚Ğ°ĞµÑ‚. Ğ£Ğ´Ğ°Ğ»ÑĞµÑ‚ 
 {
 	while (head != nullptr) pop_front();
 }
-//+ ïğîâåğêà íà íàëè÷èå ıëåìåíòîâ â ñïèñêå
-bool List::empty()
+//+ Ğ¿Ñ€Ğ¾Ğ²ĞµÑ€ĞºĞ° Ğ½Ğ° Ğ½Ğ°Ğ»Ğ¸Ñ‡Ğ¸Ğµ ÑĞ»ĞµĞ¼ĞµĞ½Ñ‚Ğ¾Ğ² Ğ² ÑĞ¿Ğ¸ÑĞºĞµ
+bool List::empty() //+
 {
 	if (head != nullptr)
 		return false;
 	else
-		return false;
+		return true;
 }
 
-//ìåòîäû èòåğàòîğà
-void* List::Iterator::getElement(size_t& size)
+//Ğ¼ĞµÑ‚Ğ¾Ğ´Ñ‹ Ğ¸Ñ‚ĞµÑ€Ğ°Ñ‚Ğ¾Ñ€Ğ°
+List::Iterator::Iterator(List* _lst) //+
 {
-	return current->data;
+	if (_lst->head == nullptr) throw List::Error("No head");
+	//Ğ¾Ğ±Ñ€Ğ°Ğ±Ğ¾Ñ‚ĞºĞ° ÑÑ‚Ğ¾Ğ³Ğ¾ Ğ¸ÑĞºĞ»ÑÑ‡ĞµĞ½Ğ¸Ñ Ğ½ÑƒĞ¶Ğ½Ğ°? Ğ’ Ñ…ÑÑˆĞµ/Ğ¼Ğ½Ğ¾Ğ¶ĞµÑÑ‚Ğ²Ğµ Ğ¿Ğ¾Ğ»ÑƒÑ‡Ğ°ĞµÑ‚ÑÑ Ğ½ĞµĞ²Ğ¾Ğ·Ğ¼Ğ¾Ğ¶Ğ½Ğ¾ÑÑ‚ÑŒ Ğ½Ğ°Ğ¹Ñ‚Ğ¸ ÑĞ»ĞµĞ¼ĞµĞ½Ñ‚, Ñ‚Ğ°Ğº ĞºĞ°Ğº Ğ¾Ğ½ Ğ²Ğ¾Ğ¾Ğ±Ñ‰Ğµ Ğ¸Ğ·Ğ½Ğ°Ñ‡Ğ°Ğ»ÑŒĞ½Ğ¾ Ğ¿ÑƒÑÑ‚. Ğ’Ğ¾Ğ¿Ñ€Ğ¾Ñ, Ğ° Ğ·Ğ°Ñ‡ĞµĞ¼ Ñ‚Ğ¾Ğ³Ğ´Ğ° Ğ²Ğ¾Ğ¾Ğ±Ñ‰Ğµ Ğ¸ÑĞ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ÑŒ find???
+	this->lst = _lst;
+	this->address = _lst->head;
+	this->first_elem = _lst->head;
+	this->last_elem = _lst->head;
+	while (last_elem->next_Node != nullptr)
+		last_elem = last_elem->next_Node;
 }
-bool List::Iterator::hasNext()
+void* List::Iterator::getElement(size_t& size) //+
 {
-	if (current->next_Node == nullptr)
+	size = address->data_Size;
+	return address->data;
+}
+bool List::Iterator::hasNext() //+
+{
+	if (this->address == nullptr || this->last_elem == nullptr) throw List::Error("No valid address"); //ĞĞµ Ğ¿Ğ¾Ğ¼Ğ½Ñ, Ñ‡Ñ‚Ğ¾ Ğ´Ğ¾Ğ»Ğ¶Ğ½Ğ¾ Ğ²Ñ‹Ğ²Ğ¾Ğ´Ğ¸Ñ‚ÑÑ
+	if (address->next_Node == nullptr)
 		return false;
 	else
 		return true;
 }
-void List::Iterator::goToNext()
+void List::Iterator::goToNext() //+
 {
-	current = current->next_Node;
+
+	if (List::Iterator::hasNext()) //Ğ¿ĞµÑ€Ğ²Ñ‹Ğ¹ ÑĞ»ĞµĞ¼ĞµĞ½Ñ‚ Ğ´Ğ¾Ğ»Ğ¶Ğµ Ğ½Ğ¼ĞµĞ½ÑÑ‚ÑŒÑÑ Ñ‚Ğ°Ğº ĞºĞ°Ğº Ğ¼ĞµĞ½ÑĞµÑ‚ÑÑ ÑĞ°Ğ¼Ğ° Ğ³Ğ¾Ğ»Ğ¾Ğ²Ğ°.
+		address = address->next_Node;
+	else
+		address = lst->head;
 }
-bool List::Iterator::equals(Container::Iterator* right)
+bool List::Iterator::equals(Container::Iterator* right) //+
 {
-	//íóæåí äîï ìåòîä? ìàòîä âûäà÷è ññûëêè... ïîãîäè... ğàçâå getelem íå âûäàåò íàì óêàçàòåëü, ÷òî óíèêàëåí äëÿ âñåõ?
-	//íóıåí ìåòîä äëÿ ïîëó÷åíèÿ ğàçìåğà èíôîğìàöèè â ıëåìåíòå
-	/*if (current->data == right->getElement(???))*/ 
-	return 0;
+	if (address->data != right->getElement(address->data_Size))
+		return false;
+	else
+		return true;
 }
 
-void* List::operator[](const int index)
-{
-	if (index < 0 || index >= list_Size) throw RangeError(index);
-	Node* current = this->head;
-	for (int i = 0; i < index; i++)
-		current = current->next_Node;
-	return current->data;
-}
+
