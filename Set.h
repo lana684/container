@@ -11,21 +11,26 @@
 using namespace std;
 
 class Set :public AbstractSet {
-    int set_size;
+    size_t set_count;
     int hash_size;
     List** list_arr; //List* -тип, * массив списков
     public:
     Set(MemoryManager &mem, int hash_size) :AbstractSet(mem) {
-        this->set_size = 0;
+        this->set_count = 0;
         this->hash_size = hash_size;
-        List** arr = (List**)_memory.allocMem(sizeof(List*)*hash_size);//разбор
+        this->list_arr = (List**)_memory.allocMem(sizeof(List*)*hash_size);//разбор
+        
+        for (int i = 0; i < hash_size; i++)
+        {
+            this->list_arr[i] = new List(mem);
+        }
     }
 
     class Iterator : public Container::Iterator
     {
         Set* set;
         size_t index;
-        void *curent;
+        void *curent; //head 
         size_t end_i;
         Container::Iterator* end;
         //List::Iterator *end;
@@ -46,6 +51,7 @@ class Set :public AbstractSet {
         // Перемещает указатель конца на последний элемент этого списка.
         // Явно возращает 1 в случае успеха и 0 неудачи.
         void find_end(size_t &index_end);
+
         friend class Set;
         ~Iterator();
     };
@@ -66,5 +72,8 @@ class Set :public AbstractSet {
     // вынести в общий
     size_t hash_function(void* key_or_value, size_t key_or_value_Size);
 
+    void rehashing(int hash_size);
+
+    ~Set();
     friend class Set::Iterator;
 };
