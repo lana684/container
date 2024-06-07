@@ -115,13 +115,12 @@ public:
 
 	class Iterator : public Container::Iterator					  //перенести в private или в protected GroupList. рассмотреть 
 	{
-	private: //в случае переноса всего класса сделать поля public
+	public: //в случае переноса всего класса сделать поля public
 		Node* address;
-		Node* first_elem; //?? тут надо подумать. Если я знаю свой списко, то я могу знать и первый элемент в списке без использования отдельной ссылки, хотя кто знает?
-		Node* last_elem;
+	
+		Node* prev_elem;
 		List* lst;
-
-	public: //методы тут не нужны. Так как реализация будет восприниматься как реализация из container. так как они похожи. Тогда можно перенести node в protected листа или вообще в groupList
+		//методы тут не нужны. Так как реализация будет восприниматься как реализация из container. так как они похожи. Тогда можно перенести node в protected листа или вообще в groupList
 		
 		//Конструктор Итератора
 		//Заполняются поля address, first_elem, last_elem, lst;
