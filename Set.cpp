@@ -56,7 +56,7 @@ void* Set::Iterator::getElement(size_t& size)
 bool Set::Iterator::hasNext()
 {
     size_t hash = this->set->hash_size; hash--;
-    int tmp_i = this->index;
+    int tmp_i = this->index;//re
     int empty = 0;
     if (this->iter_l->hasNext() == true)
         return true;
@@ -362,7 +362,7 @@ int Set::insert(void* elem, size_t size)
     catch (std::bad_alloc& ba)
     {
         std::cerr << ba.what() << std::endl;
-    }// убрать
+    }
     return -2;
 }
 
@@ -393,20 +393,43 @@ size_t Set::hash_function(void* value, size_t valueSize)
 }
 
 //--
-void Set::rehashing(int& hash_size, MemoryManager& mem)
+void Set::rehashing(MemoryManager& mem)
 {
+    size_t prev_hesh_size = hash_size;
     hash_size = 2 * hash_size;
     List** new_list_arr = (List**)_memory.allocMem(sizeof(List*) * hash_size);   
     for (int i = 0; i < hash_size; i++)
     {
         this->list_arr[i] = new List(mem);
     }
-    size_t count = this->set_count;
-    Container::Iterator* iter = this->newIterator();
-    while (count > 0)
+    size_t size = 0;
+    void* elem = nullptr;
+    size_t hash_num = 0;
+    Container::Iterator* iter = nullptr;
+    for (int i = 0; i < prev_hesh_size; i++)
     {
-
+        if (!this->list_arr[i]->empty())
+        {
+            iter = this->list_arr[i]->newIterator();
+            while (iter->hasNext())
+            {
+                elem = iter->getElement(size);
+                if (elem)
+                {
+                    hash_num = this->hash_function(elem, size);
+                    new_list_arr[hash_num]->push_front(elem, size);
+                }
+                iter->goToNext();
+            }
+            this->list_arr[i]->clear();
+        }
     }
+    for (int i = 0; i < this->hash_size; i++)
+    {
+        delete this->list_arr[i];
+    }
+    _memory.freeMem(this->list_arr);
+    this->list_arr = new_list_arr;
     return;
 }
 
