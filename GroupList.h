@@ -43,7 +43,7 @@ public:
 			return 0;
     }
 
-	class Iterator : public Container::Iterator
+	/*class Iterator : public Container::Iterator
 	{
 	public:
 		Node* address;
@@ -55,7 +55,7 @@ public:
 		bool hasNext();
 		void goToNext();
 		bool equals(Iterator* right);
-	};
+	};*/
 
 
 };
