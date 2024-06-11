@@ -9,6 +9,7 @@ List::List(MemoryManager& mem) : AbstractList(mem)
 List::~List()
 {
 	clear();
+	
 }
 
 
@@ -123,7 +124,9 @@ Container::Iterator* List::newIterator()
 {
 	if (this->head != nullptr)
 	{
-		Iterator* it = new Iterator(this);
+		Iterator* it = new Iterator();
+		it->address = head;
+		it->headInIter = head;
 		return it;
 	}
 	else
@@ -132,6 +135,7 @@ Container::Iterator* List::newIterator()
 
 void List::remove(Container::Iterator* iter)
 {
+	if (head == nullptr) throw List::Error("");
 	List::Iterator* iterator = dynamic_cast<List::Iterator*>(iter);
 	if (iterator)
 	{
@@ -149,18 +153,16 @@ void List::remove(Container::Iterator* iter)
 			else
 				iterator->prev_elem->next_Node = iterator->address->next_Node;
 		}
-		iter->goToNext();
-		this->mem_Size_List -= iterator->prev_elem->data_Size;
+		this->mem_Size_List -= iterator->address->data_Size;
 		this->list_Size--;
+		iter->goToNext();
 
 		_memory.freeMem(iterator->prev_elem->data);
 
 		delete(iterator->prev_elem);
 	}
 	else
-	{
-		//Здесь поставить обработку этой ошибки
-	}
+		return;
 }
 
 void List::clear() 
@@ -177,15 +179,15 @@ bool List::empty()
 }
 
 
-List::Iterator::Iterator(List* _lst)
+List::Iterator::Iterator()
 {
-	this->lst = _lst;
-	this->address = _lst->head;
+	this->address = nullptr;
 	this->prev_elem = nullptr;
+	this->headInIter = nullptr;
 }
 void* List::Iterator::getElement(size_t& size)
 {
-	if (this->lst->head != nullptr)
+	if (address != nullptr)
 	{
 		size = address->data_Size;
 		return address->data;
@@ -195,7 +197,7 @@ void* List::Iterator::getElement(size_t& size)
 }
 bool List::Iterator::hasNext() 
 {
-	if (address->next_Node == nullptr || this->lst->head == nullptr)
+	if (address->next_Node == nullptr)
 		return false;
 	else
 		return true;
@@ -211,7 +213,7 @@ void List::Iterator::goToNext()
 	else
 	{
 		prev_elem = nullptr;
-		address = lst->head;
+		address = headInIter;
 	}
 }
 bool List::Iterator::equals(Container::Iterator* right) 
