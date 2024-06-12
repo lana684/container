@@ -22,6 +22,8 @@ protected:
 
 	Node* head;
 
+
+
 public:
 	
     GroupList(MemoryManager &mem): Container(mem) {}
@@ -43,19 +45,21 @@ public:
 			return 0;
     }
 
-	/*class Iterator : public Container::Iterator
+
+
+	class Iterator : public Container::Iterator
 	{
 	public:
 		Node* address;
 		Node* prev_elem;
 		Node* headInIter;
 		Iterator();
-
 		void* getElement(size_t& size);
 		bool hasNext();
 		void goToNext();
-		bool equals(Iterator* right);
-	};*/
+		bool equals(Container::Iterator* right);
+	};
 
+	
 
 };

@@ -55,7 +55,7 @@ void* List::front(size_t&)
 	return head;
 }
 
-int List::insert(Container::Iterator* iter, void* elem, size_t elemSize) 
+int List::insert(Iterator* iter, void* elem, size_t elemSize) 
 {
 
 	void* wdst_elem = _memory.allocMem(elemSize);
@@ -96,7 +96,7 @@ size_t List::max_bytes()
 	return  _memory.size();
 }
 
-Container::Iterator* List::find(void* elem, size_t size) 
+GroupList::Iterator* List::find(void* elem, size_t size)
 {
 	if (this->head != nullptr)
 	{
@@ -120,7 +120,7 @@ Container::Iterator* List::find(void* elem, size_t size)
 		return nullptr;
 }
 
-Container::Iterator* List::newIterator() 
+GroupList::Iterator* List::newIterator() 
 {
 	if (this->head != nullptr)
 	{
@@ -136,7 +136,7 @@ Container::Iterator* List::newIterator()
 void List::remove(Container::Iterator* iter)
 {
 	if (head == nullptr) throw List::Error("");
-	List::Iterator* iterator = dynamic_cast<List::Iterator*>(iter);
+	Iterator* iterator = dynamic_cast<Iterator*>(iter);
 	if (iterator)
 	{
 		if (iter->hasNext() == 0)
@@ -158,11 +158,16 @@ void List::remove(Container::Iterator* iter)
 		iter->goToNext();
 
 		if (iterator->prev_elem != nullptr)
+		{
 			_memory.freeMem(iterator->prev_elem->data);
+			delete(iterator->prev_elem);
+		}
 		else
+		{
 			_memory.freeMem(iterator->address->data);
-
-		delete(iterator->prev_elem);
+			delete(iterator->address);
+		}
+		
 	}
 	else
 		return;
@@ -182,49 +187,49 @@ bool List::empty()
 }
 
 
-List::Iterator::Iterator()
-{
-	this->address = nullptr;
-	this->prev_elem = nullptr;
-	this->headInIter = nullptr;
-}
-void* List::Iterator::getElement(size_t& size)
-{
-	if (address != nullptr)
-	{
-		size = address->data_Size;
-		return address->data;
-	}
-	else
-		return nullptr;
-}
-bool List::Iterator::hasNext() 
-{
-	if (address->next_Node == nullptr)
-		return false;
-	else
-		return true;
-}
-void List::Iterator::goToNext() 
-{
-
-	if (List::Iterator::hasNext())
-	{
-		prev_elem = address;
-		address = address->next_Node;
-	}
-	else
-	{
-		prev_elem = nullptr;
-		address = headInIter;
-	}
-}
-bool List::Iterator::equals(Container::Iterator* right) 
-{
-	if (address->data != right->getElement(address->data_Size))
-		return false;
-	else
-		return true;
-}
+//List::Iterator::Iterator()
+//{
+//	this->address = nullptr;
+//	this->prev_elem = nullptr;
+//	this->headInIter = nullptr;
+//}
+//void* List::Iterator::getElement(size_t& size)
+//{
+//	if (address != nullptr)
+//	{
+//		size = address->data_Size;
+//		return address->data;
+//	}
+//	else
+//		return nullptr;
+//}
+//bool List::Iterator::hasNext() 
+//{
+//	if (address->next_Node == nullptr)
+//		return false;
+//	else
+//		return true;
+//}
+//void List::Iterator::goToNext() 
+//{
+//
+//	if (List::Iterator::hasNext())
+//	{
+//		prev_elem = address;
+//		address = address->next_Node;
+//	}
+//	else
+//	{
+//		prev_elem = nullptr;
+//		address = headInIter;
+//	}
+//}
+//bool List::Iterator::equals(Container::Iterator* right) 
+//{
+//	if (address->data != right->getElement(address->data_Size))
+//		return false;
+//	else
+//		return true;
+//}
 
 
