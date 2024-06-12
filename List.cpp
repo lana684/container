@@ -157,7 +157,10 @@ void List::remove(Container::Iterator* iter)
 		this->list_Size--;
 		iter->goToNext();
 
-		_memory.freeMem(iterator->prev_elem->data);
+		if (iterator->prev_elem != nullptr)
+			_memory.freeMem(iterator->prev_elem->data);
+		else
+			_memory.freeMem(iterator->address->data);
 
 		delete(iterator->prev_elem);
 	}
