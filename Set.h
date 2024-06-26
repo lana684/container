@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <iostream>
-#include <list>
 #include "List.h"
 #include "Mem.h"
 #include "SetAbstract.h"
@@ -18,10 +17,14 @@ class Set :public AbstractSet {
     Set(MemoryManager &mem, int hash_size) :AbstractSet(mem) {
         this->set_count = 0;
         this->hash_size = hash_size;
-        this->list_arr = (List**)_memory.allocMem(sizeof(List*)*hash_size);//разбор
+        this->list_arr = (List**)_memory.allocMem(sizeof(List*) * hash_size);
+        
+        //this->list_arr = (List**)malloc(sizeof(List*) * hash_size);
+        
         
         for (int i = 0; i < hash_size; i++)
         {
+            //this->list_arr[i] = (List*)malloc(sizeof(List));
             this->list_arr[i] = new List(mem);
         }
     }
@@ -56,6 +59,17 @@ class Set :public AbstractSet {
         ~Iterator();
     };
 
+    class Error //класс вывода ошибок
+    {
+    public:
+        char msg[256];
+        Error(const char* err_msg)
+        {
+            strcpy(msg, err_msg);
+            cout << msg << endl; //вывод этого сообщения 
+        }
+    };
+
     int size() override;
     size_t max_bytes() override;
     Container::Iterator* find(void *elem, size_t size) override;
@@ -72,7 +86,7 @@ class Set :public AbstractSet {
     // вынести в общий
     size_t hash_function(void* key_or_value, size_t key_or_value_Size);
 
-    void rehashing(int hash_size);
+    void rehashing(MemoryManager& mem);
 
     ~Set();
     friend class Set::Iterator;

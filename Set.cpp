@@ -44,8 +44,8 @@ Set::Iterator::~Iterator()
 {
     delete this->iter_l;
     delete this->end;
-    this->set = NULL;
-    this->curent = NULL;
+    this->set = nullptr;
+    this->curent = nullptr;
 }
 
 void* Set::Iterator::getElement(size_t& size)
@@ -56,7 +56,7 @@ void* Set::Iterator::getElement(size_t& size)
 bool Set::Iterator::hasNext()
 {
     size_t hash = this->set->hash_size; hash--;
-    int tmp_i = this->index;//re
+    int tmp_i = this->index;
     int empty = 0;
     if (this->iter_l->hasNext() == true)
         return true;
@@ -67,7 +67,7 @@ bool Set::Iterator::hasNext()
         {
             tmp_i++;
             if (!this->set->list_arr[tmp_i]->empty())
-                tmp_list = this->set->list_arr[tmp_i];
+                tmp_list = this->set->list_arr[tmp_i];//???
         }
         if (tmp_list)
             return true;
@@ -82,11 +82,24 @@ void Set::Iterator::goToNext()
         if (this->iter_l->hasNext() == false && this->iter_l != this->end)
         {
             int tmp = this->set->hash_size; tmp--;
-            while (this->iter_l == NULL || this->index != tmp)
+            //while (this->iter_l == nullptr || this->index != tmp)
+            //{
+            //    this->index++; 
+            //    //this->iter_l->goToNext();
+            //    if(!this->set->list_arr[this->index]->empty())
+            //        this->iter_l = this->set->list_arr[this->index]->newIterator();
+            //    this->curent = this->set->list_arr[this->index];
+            //}
+            void* tmp_list = nullptr;
+            while (tmp_list == nullptr && this->index < tmp)
             {
-                this->index++; 
-                this->iter_l->goToNext();
-                this->curent = this->set->list_arr[this->index];
+                this->index++;
+                if (!this->set->list_arr[this->index]->empty())
+                    tmp_list = this->set->list_arr[this->index];
+            }
+            if (tmp_list)
+            {
+                this->iter_l = this->set->list_arr[this->index]->newIterator();
             }
         }
         else if (this->iter_l->hasNext())
@@ -185,6 +198,7 @@ Container::Iterator* Set::find(void* elem, size_t size)
 
     if (Iter->iter_l == nullptr)
     {
+        delete Iter;
         return nullptr;
     }
     else { return Iter; }
@@ -344,6 +358,7 @@ int Set::insert(void* elem, size_t size)
                 iter = this->list_arr[hash]->find(elem, size);
                 if (iter == nullptr)
                 {
+                    // размер списка не граница -> рехэш
                     result = this->list_arr[hash]->push_front(elem, size);
                 }
                 else { return -1; }
@@ -400,7 +415,7 @@ void Set::rehashing(MemoryManager& mem)
     List** new_list_arr = (List**)_memory.allocMem(sizeof(List*) * hash_size);   
     for (int i = 0; i < hash_size; i++)
     {
-        this->list_arr[i] = new List(mem);
+        new_list_arr[i] = new List(mem);
     }
     size_t size = 0;
     void* elem = nullptr;
@@ -410,7 +425,7 @@ void Set::rehashing(MemoryManager& mem)
     {
         if (!this->list_arr[i]->empty())
         {
-            iter = this->list_arr[i]->newIterator();
+            iter = this->list_arr[i]->newIterator(); //удалять
             while (iter->hasNext())
             {
                 elem = iter->getElement(size);
@@ -437,7 +452,11 @@ Set::~Set()
 {
     for (int i = 0; i < this->hash_size; i++)
     {
+        //printf("list_arr[i] %d\n", sizeof(*this->list_arr[i]));
+        //this->list_arr[i]->clear();
         delete this->list_arr[i];
     }
+    //printf("list_arr %d\n", sizeof(*this->list_arr));
     _memory.freeMem(this->list_arr);
+
 }
