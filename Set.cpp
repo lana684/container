@@ -27,19 +27,6 @@ Set::Iterator::Iterator(Set* set)
     }
 }
 
-/*Set::Iterator::Iterator(Set* set)
-{
-    this->index = 0;
-    this->set = set;
-    this->curent = set->list_arr[index];
-    try {
-        this->iter_l = this->set->list_arr[this->index]->newIterator();
-        this->end_i = this->set->hash_size; this->end_i--;
-        this->end = set->list_arr[this->end_i]->newIterator();
-    }
-    catch (List::Error) { printf("Go to next"); }// оптимизация?
-}*/
-
 Set::Iterator::~Iterator()
 {
     delete this->iter_l;
@@ -99,7 +86,7 @@ void Set::Iterator::goToNext()
             }
             if (tmp_list)
             {
-                this->iter_l = this->set->list_arr[this->index]->newIterator();
+                this->iter_l = this->set->list_arr[this->index]->newIterator(); //утекает итератор
             }
         }
         else if (this->iter_l->hasNext())
@@ -138,7 +125,9 @@ void Set::Iterator::find_end(size_t& indx_end)
         {
             indx_end = j;
             size_t size = 0;
-            this->end = this->set->list_arr[j]->newIterator();
+            if(this->end == nullptr)
+                this->end = this->set->list_arr[j]->newIterator(); // 32байта
+
             if (this->end)
             {
                 while (this->end->hasNext()) {
@@ -198,7 +187,6 @@ Container::Iterator* Set::find(void* elem, size_t size)
 
     if (Iter->iter_l == nullptr)
     {
-        delete Iter;
         return nullptr;
     }
     else { return Iter; }
@@ -210,7 +198,7 @@ Container::Iterator* Set::newIterator()
     if (this->set_count == 0) { return nullptr; }
     else
     {
-        Set::Iterator* Iter = new Set::Iterator(this);
+        Set::Iterator* Iter = new Set::Iterator(this); // утекает 56 байт
         return Iter;
     }
 }
@@ -350,33 +338,30 @@ int Set::insert(void* elem, size_t size)
     size_t hash = this->hash_function(elem, size);
     Container::Iterator* iter = nullptr;
     int result = -2;
-    try {
-        if (hash < this->hash_size)
-        {
-            if (this->list_arr[hash]->empty() == false)
-            {
-                iter = this->list_arr[hash]->find(elem, size);
-                if (iter == nullptr)
-                {
-                    // размер списка не граница -> рехэш
-                    result = this->list_arr[hash]->push_front(elem, size);
-                }
-                else { return -1; }
-            }
-            else
-            {
-                result = this->list_arr[hash]->push_front(elem, size);
-            }
-            if (result == 1) { return -2; }
-            else {
-                this->set_count++;
-                return 0;
-            }
-        }
-    }
-    catch (std::bad_alloc& ba)
+
+    if (hash < this->hash_size)
     {
-        std::cerr << ba.what() << std::endl;
+        if (this->list_arr[hash]->empty() == false)
+        {
+            iter = this->list_arr[hash]->find(elem, size); // утекает созданный итератор
+            List::Iterator* it = dynamic_cast<List::Iterator*>(iter);
+            if (it->address == nullptr)
+            {
+                // размер списка не граница -> рехэш
+                result = this->list_arr[hash]->push_front(elem, size);
+                delete iter;
+            }
+            else { return -1; }
+        }
+        else
+        {
+            result = this->list_arr[hash]->push_front(elem, size);
+        }
+        if (result == 1) { return -2; }
+        else {
+            this->set_count++;
+            return 0;
+        }
     }
     return -2;
 }
@@ -386,12 +371,6 @@ size_t Set::hash_function(void* value, size_t valueSize)
 {
     if (value)
     {
-        /*size_t hash = 0;
-        char* k = (char*)value;
-        for (int i = 0; i < valueSize; i++)
-        {
-            hash = (hash << 5) - hash + k[i];
-        }*/
         size_t hash = 0;
         char* k = (char*)value;
         for (int i = 0; i < valueSize; i++)
@@ -452,11 +431,8 @@ Set::~Set()
 {
     for (int i = 0; i < this->hash_size; i++)
     {
-        //printf("list_arr[i] %d\n", sizeof(*this->list_arr[i]));
-        //this->list_arr[i]->clear();
-        delete this->list_arr[i];
+        delete list_arr[i];
     }
-    //printf("list_arr %d\n", sizeof(*this->list_arr));
     _memory.freeMem(this->list_arr);
-
+    _CrtDumpMemoryLeaks();
 }

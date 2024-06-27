@@ -18,13 +18,8 @@ class Set :public AbstractSet {
         this->set_count = 0;
         this->hash_size = hash_size;
         this->list_arr = (List**)_memory.allocMem(sizeof(List*) * hash_size);
-        
-        //this->list_arr = (List**)malloc(sizeof(List*) * hash_size);
-        
-        
         for (int i = 0; i < hash_size; i++)
         {
-            //this->list_arr[i] = (List*)malloc(sizeof(List));
             this->list_arr[i] = new List(mem);
         }
     }
