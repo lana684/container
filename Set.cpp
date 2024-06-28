@@ -26,10 +26,9 @@ Set::Iterator::Iterator(Set* set)
             this->iter_l = set->list_arr[first_index]->newIterator();
         else
         {
-            List* list = (List*)this->curent;
-            this->shiftIter(list, this->iter_l);
+            delete this->iter_l;
+            this->iter_l = set->list_arr[first_index]->newIterator();
         }
-        //this->find_end(end_index);
     }
 }
 
@@ -37,7 +36,6 @@ Set::Iterator::~Iterator()
 {
     List::Iterator* iter = (List::Iterator*)this->iter_l;
     delete iter;
-    //delete this->end;
     this->set = nullptr;
     this->curent = nullptr;
 }
@@ -90,9 +88,8 @@ void Set::Iterator::goToNext()
                     this->iter_l = this->set->list_arr[this->index]->newIterator(); //утекает итератор
                 else
                 {
-                    //если итератор уже есть что делать?
-                    List* list = (List*)tmp_list;
-                    this->shiftIter(list, this->iter_l);
+                    delete this->iter_l;
+                    this->iter_l = this->set->list_arr[this->index]->newIterator();
                 }
             }
         }
@@ -142,32 +139,9 @@ size_t Set::max_bytes() {
     return _memory.size();
 }
 
-//+- менялся
-/*Container::Iterator* Set::find(void* elem, size_t size)
-{
-    size_t hash = this->hash_function(elem, size);
-    Set::Iterator* Iter = dynamic_cast<Set::Iterator*>(this->newIterator());
-    if (this->list_arr[hash]->empty() && Iter)
-    {
-        if (Iter->index != hash) {
-            Iter->index = hash;
-            Iter->curent = this->list_arr[hash];
-        }
-        Iter->iter_l = Iter->set->list_arr[hash]->find(elem, size);
-        Iter->find_end(Iter->end_i);
-        if (Iter->iter_l == nullptr)
-        {
-            //delete Iter;
-            return nullptr;
-        }
-        else { return Iter; }
-    }
-}*/
-
 Container::Iterator* Set::find(void* elem, size_t size)
 {
     size_t hash = this->hash_function(elem, size);
-    // dynamic_cast<тип_в_который_преобразуем>(преобразуемый_объект)
     if (this->list_arr[hash]->empty())
         return nullptr;
 
@@ -176,21 +150,19 @@ Container::Iterator* Set::find(void* elem, size_t size)
         Iter->index = hash;
         Iter->curent = this->list_arr[hash];
     }
-    //Iter->shiftIter(this->list_arr[hash], Iter->iter_l);//обновление
     List::Iterator* iter = (List::Iterator*)Iter->iter_l;
     delete iter;
     Iter->iter_l = Iter->set->list_arr[hash]->find(elem, size);
-    iter = (List::Iterator*)Iter->iter_l;
-    //Iter->find_end(Iter->end_i);
+    
 
-    if (iter->address == nullptr)
+    if (Iter->iter_l == nullptr)
     {
+        delete Iter;
         return nullptr;
     }
     else { return Iter; }
 }
 
-//менялся
 Container::Iterator* Set::newIterator()
 {
     if (this->set_count == 0) { return nullptr; }
@@ -213,7 +185,7 @@ void Set::remove(Container::Iterator* iter)
             if (!this->list_arr[iter1->index]->empty() /* && this->list_arr[iter1->index]->find(elem, size) != nullptr*/)
             {
                 List::Iterator* it = (List::Iterator*)this->list_arr[iter1->index]->find(elem, size);
-                if (it->address)
+                if (it)
                 {
                     int flag = 1;
                     size_t hash_num = hash_function(elem, size);
@@ -251,59 +223,14 @@ void Set::remove(Container::Iterator* iter)
                         if (tmp_iter != nullptr)
                             tmp_iter = nullptr;
                         delete help;
-                        delete it;
                     }
+                    delete it;
                 }
             }
         }
     }
 
 }
-
-//+- ???
-/*void Set::remove(Container::Iterator* iter)
-{
-    char remove_flg = 1;
-    Set::Iterator* iter_s = dynamic_cast<Set::Iterator*>(iter);
-    size_t tmp_size = 0;
-    void* tmp_elem = iter->getElement(tmp_size);
-    size_t hash = hash_function(tmp_elem, tmp_size);
-    Set::Iterator* it = dynamic_cast<Set::Iterator*>(this->find(tmp_elem, tmp_size));
-    if (it && iter_s)
-    {
-        if (it->equals(iter) == true)
-        {
-            if (it->hasNext() == false && it->iter_l->equals(it->end) == true) //если последний элемент последнего непустого списка
-            {
-                try {
-                    this->list_arr[hash]->remove(it->iter_l);
-                }
-                catch (List::Error)
-                {
-                    std::cout << "Error";
-                }
-                remove_flg = 0;
-                it->find_end(it->end_i);
-            }
-            else if (it->hasNext() == true && it->iter_l->hasNext() == false) // последний элемент текущего списка
-            {
-                iter_s->goToNext();
-                this->list_arr[hash]->remove(it->iter_l);
-                remove_flg = 0;
-            }
-            else if (it->iter_l->hasNext() == true) //если  не последний элемент текущего списка
-            {
-                this->list_arr[hash]->remove(iter_s->iter_l);
-                remove_flg = 0;
-            }
-            if (remove_flg == 0)
-            {
-                it->set->set_count--;
-            }
-        }
-        if (it != nullptr) { _memory.freeMem(it); } // проверка на пустоту
-    }
-}*/
 
 //+- ???
 void Set::clear()
@@ -343,20 +270,30 @@ int Set::insert(void* elem, size_t size)
     size_t hash = this->hash_function(elem, size);
     Container::Iterator* iter = nullptr;
     int result = -2;
-
+    int rehash_flag = 0;
     if (hash < this->hash_size)
     {
         if (this->list_arr[hash]->empty() == false)
         {
             iter = this->list_arr[hash]->find(elem, size); // утекает созданный итератор
-            List::Iterator* it = dynamic_cast<List::Iterator*>(iter);
-            if (it->address == nullptr)
+            if (iter == nullptr)
             {
-                // размер списка не граница -> рехэш
+                if (this->list_arr[hash]->size() == 50)
+                {
+                    rehash_flag++;
+                }
                 result = this->list_arr[hash]->push_front(elem, size);
                 delete iter;
             }
-            else { return -1; }
+            else {
+                delete iter;
+                return -1; 
+            }
+            if (rehash_flag == 1)
+            {
+                this->rehashing(_memory);
+                cout << "NEW HASH SIZE " << this->hash_size << endl;
+            }
         }
         else
         {
@@ -376,16 +313,7 @@ size_t Set::hash_function(void* value, size_t valueSize)
 {
     if (value)
     {
-        size_t hash = 0;
-        char* k = (char*)value;
-        for (int i = 0; i < valueSize; i++)
-        {
-            hash = (hash << 5) - hash + k[i];
-            hash ^= (hash << 5) + 1;
-        }
-        //printf("%d ", hash % this->hash_size);
-        return hash % this->hash_size;
-        // хэш номер списка, остаток от деления на количество списков
+        return GroupContainer::hash_function(value, valueSize) % this->hash_size;
     }
     else
         throw Container::Error("Hash_err");
@@ -394,7 +322,7 @@ size_t Set::hash_function(void* value, size_t valueSize)
 //--
 void Set::rehashing(MemoryManager& mem)
 {
-    size_t prev_hesh_size = hash_size;
+    size_t prev_hash_size = hash_size;
     hash_size = 2 * hash_size;
     List** new_list_arr = (List**)_memory.allocMem(sizeof(List*) * hash_size);   
     for (int i = 0; i < hash_size; i++)
@@ -405,7 +333,7 @@ void Set::rehashing(MemoryManager& mem)
     void* elem = nullptr;
     size_t hash_num = 0;
     Container::Iterator* iter = nullptr;
-    for (int i = 0; i < prev_hesh_size; i++)
+    for (int i = 0; i < prev_hash_size; i++)
     {
         if (!this->list_arr[i]->empty())
         {
@@ -423,7 +351,7 @@ void Set::rehashing(MemoryManager& mem)
             this->list_arr[i]->clear();
         }
     }
-    for (int i = 0; i < this->hash_size; i++)
+    for (int i = 0; i < prev_hash_size; i++)
     {
         delete this->list_arr[i];
     }

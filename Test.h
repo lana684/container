@@ -20,9 +20,6 @@ public:
     //test for multiple insertion of identical objects
     int testMultiInsert(void* elem, size_t size);
 
-    //test for searching for objects in a container
-    int testFind(size_t testCount);
-
     //test for inserting identical elements with different types
     int testInsertByType(void* elem1, size_t size1, void* elem2, size_t size2);
 
@@ -36,7 +33,7 @@ public:
     int testСonditionalRemove(size_t testCount);
 
     //test for removing an element that is pointed to by various iterators
-    int testDoubleRemove(void* elem, size_t elemSize);
+    int testTwiceRemove(void* elem, size_t elemSize);
 
     //test for empty() and clear()
     //если пустой вернет 0; если не пустой и почистилось 1; если не пустой и не почистилось или произошел сбой 2

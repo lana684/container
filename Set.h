@@ -9,12 +9,12 @@
 
 using namespace std;
 
-class Set :public AbstractSet{
+class Set :public AbstractSet {
     size_t set_count;
     int hash_size;
     List** list_arr; //List* -тип, * массив списков
-    public:
-    Set(MemoryManager &mem, int hash_size) :AbstractSet(mem){
+public:
+    Set(MemoryManager& mem, int hash_size) :AbstractSet(mem) {
         this->set_count = 0;
         this->hash_size = hash_size;
         this->list_arr = (List**)_memory.allocMem(sizeof(List*) * hash_size);
@@ -28,7 +28,7 @@ class Set :public AbstractSet{
     {
         Set* set;
         size_t index;
-        void *curent; //head 
+        void* curent; //head 
         size_t end_i;
         //Container::Iterator* end;
         //List::Iterator *end;
@@ -78,16 +78,16 @@ class Set :public AbstractSet{
 
     int size() override;
     size_t max_bytes() override;
-    Container::Iterator* find(void *elem, size_t size) override;
+    Container::Iterator* find(void* elem, size_t size) override;
     Container::Iterator* newIterator() override;
-    void remove(Container::Iterator *iter) override;
+    void remove(Container::Iterator* iter) override;
     void clear() override;
     bool empty() override;
 
 
     // Добавление элемента в контейнер в соответствующую позицию, в соответствии с выбором реализации множества.
     // В случае успешного добавления функция возвращает значение 0, если такой элемент уже есть в контейнере - 1, во всех остальных случаях - 2.
-    int insert(void *elem, size_t size) override;
+    int insert(void* elem, size_t size) override;
 
     // вынести в общий
     size_t hash_function(void* key_or_value, size_t key_or_value_Size);
