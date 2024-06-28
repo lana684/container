@@ -22,15 +22,22 @@ Set::Iterator::Iterator(Set* set)
         this->index = first_index;
         this->curent = set->list_arr[first_index];
         this->end_i = end_index;
-        this->iter_l = set->list_arr[first_index]->newIterator();
-        this->find_end(end_index);
+        if(!this->iter_l)
+            this->iter_l = set->list_arr[first_index]->newIterator();
+        else
+        {
+            List* list = (List*)this->curent;
+            this->shiftIter(list, this->iter_l);
+        }
+        //this->find_end(end_index);
     }
 }
 
 Set::Iterator::~Iterator()
 {
-    delete this->iter_l;
-    delete this->end;
+    List::Iterator* iter = (List::Iterator*)this->iter_l;
+    delete iter;
+    //delete this->end;
     this->set = nullptr;
     this->curent = nullptr;
 }
@@ -47,36 +54,29 @@ bool Set::Iterator::hasNext()
     int empty = 0;
     if (this->iter_l->hasNext() == true)
         return true;
-    else if (this->iter_l->hasNext() == false && this->iter_l != this->end )
+    else if (this->iter_l->hasNext() == false && this->index != this->end_i )
     {
         void* tmp_list = nullptr;
         while (tmp_list == nullptr && tmp_i < hash)
         {
             tmp_i++;
             if (!this->set->list_arr[tmp_i]->empty())
-                tmp_list = this->set->list_arr[tmp_i];//???
+                tmp_list = this->set->list_arr[tmp_i];
         }
         if (tmp_list)
             return true;
         else { return false; }
     }
+    return false;
 }
 
 void Set::Iterator::goToNext()
 {
     if (this->hasNext() == true)
     {
-        if (this->iter_l->hasNext() == false && this->iter_l != this->end)
+        if (this->iter_l->hasNext() == false && this->index != this->end_i)
         {
             int tmp = this->set->hash_size; tmp--;
-            //while (this->iter_l == nullptr || this->index != tmp)
-            //{
-            //    this->index++; 
-            //    //this->iter_l->goToNext();
-            //    if(!this->set->list_arr[this->index]->empty())
-            //        this->iter_l = this->set->list_arr[this->index]->newIterator();
-            //    this->curent = this->set->list_arr[this->index];
-            //}
             void* tmp_list = nullptr;
             while (tmp_list == nullptr && this->index < tmp)
             {
@@ -86,7 +86,14 @@ void Set::Iterator::goToNext()
             }
             if (tmp_list)
             {
-                this->iter_l = this->set->list_arr[this->index]->newIterator(); //утекает итератор
+                if(!this->iter_l)
+                    this->iter_l = this->set->list_arr[this->index]->newIterator(); //утекает итератор
+                else
+                {
+                    //если итератор уже есть что делать?
+                    List* list = (List*)tmp_list;
+                    this->shiftIter(list, this->iter_l);
+                }
             }
         }
         else if (this->iter_l->hasNext())
@@ -94,6 +101,17 @@ void Set::Iterator::goToNext()
             this->iter_l->goToNext();
         }
     }
+}
+
+
+void Set::Iterator::shiftIter(List* list, Container::Iterator* listIter)
+{
+    List::Iterator* iter = dynamic_cast<List::Iterator*>(listIter);
+    List::Iterator* tmp = list->newIterator();
+    iter->address = tmp->address;
+    iter->headInIter = iter->address;
+    iter->prev_elem = nullptr;
+    delete tmp;
 }
 
 //+-
@@ -115,30 +133,6 @@ bool Set::Iterator::equals(Container::Iterator* right)
     else { return false; }*/
 }
 
-void Set::Iterator::find_end(size_t& indx_end)
-{
-    int max_indx = this->set->hash_size;
-    max_indx--;
-    for (int j = max_indx; j >= 0; j--)
-    {
-        if (!this->set->list_arr[j]->empty())
-        {
-            indx_end = j;
-            size_t size = 0;
-            if(this->end == nullptr)
-                this->end = this->set->list_arr[j]->newIterator(); // 32байта
-
-            if (this->end)
-            {
-                while (this->end->hasNext()) {
-                    this->end->goToNext();
-                }
-                return;
-            }
-        }
-    }
-    return;
-}
 
 int Set::size() {
     return this->set_count;
@@ -182,10 +176,14 @@ Container::Iterator* Set::find(void* elem, size_t size)
         Iter->index = hash;
         Iter->curent = this->list_arr[hash];
     }
+    //Iter->shiftIter(this->list_arr[hash], Iter->iter_l);//обновление
+    List::Iterator* iter = (List::Iterator*)Iter->iter_l;
+    delete iter;
     Iter->iter_l = Iter->set->list_arr[hash]->find(elem, size);
+    iter = (List::Iterator*)Iter->iter_l;
     //Iter->find_end(Iter->end_i);
 
-    if (Iter->iter_l == nullptr)
+    if (iter->address == nullptr)
     {
         return nullptr;
     }
@@ -212,42 +210,49 @@ void Set::remove(Container::Iterator* iter)
         {
             size_t size = 0;
             void* elem = iter1->iter_l->getElement(size);
-            if (!this->list_arr[iter1->index]->empty() && this->list_arr[iter1->index]->find(elem, size) != nullptr)
+            if (!this->list_arr[iter1->index]->empty() /* && this->list_arr[iter1->index]->find(elem, size) != nullptr*/)
             {
-                int flag = 1;
-                size_t hash_num = hash_function(elem, size);
-                Container::Iterator* tmp_iter = this->list_arr[hash_num]->find(elem, size); //указатель типа лист итератор
-                if (tmp_iter)
+                List::Iterator* it = (List::Iterator*)this->list_arr[iter1->index]->find(elem, size);
+                if (it->address)
                 {
-                    // если последний элемент последнего непустого списка
-                    if (iter->hasNext() == false && tmp_iter->hasNext() == false)
+                    int flag = 1;
+                    size_t hash_num = hash_function(elem, size);
+                    Container::Iterator* tmp_iter = this->list_arr[hash_num]->find(elem, size); //указатель типа лист итератор
+                    List::Iterator* help = (List::Iterator*)tmp_iter;
+                    if (tmp_iter)
                     {
-                        size_t tmp_size = 0;
-                        this->list_arr[hash_num]->remove(tmp_iter);
-                        if (!tmp_iter && tmp_iter->getElement(tmp_size) == this->list_arr[hash_num]->front(size))
+                        // если последний элемент последнего непустого списка
+                        if (iter->hasNext() == false && tmp_iter->hasNext() == false)
                         {
-                            throw Set::Error("The iterator has reached the end of the array");
+                            size_t tmp_size = 0;
+                            this->list_arr[hash_num]->remove(tmp_iter);
+                            if (!tmp_iter && tmp_iter->getElement(tmp_size) == this->list_arr[hash_num]->front(size))
+                            {
+                                throw Set::Error("The iterator has reached the end of the array");
+                            }
+                            flag = 0;
                         }
-                        flag = 0;
-                    }
-                    // последний элемент текущего списка
-                    else if (iter->hasNext() && !tmp_iter->hasNext())
-                    {
-                        iter->goToNext();
-                        this->list_arr[hash_num]->remove(tmp_iter);
-                        flag = 0;
-                    }
-                    // если  не последний элемент текущего списка
-                    else if (tmp_iter->hasNext())
-                    {
-                        this->list_arr[hash_num]->remove(tmp_iter);
-                        flag = 0;
-                    }
+                        // последний элемент текущего списка
+                        else if (iter->hasNext() && !tmp_iter->hasNext())
+                        {
+                            iter->goToNext();
+                            this->list_arr[hash_num]->remove(tmp_iter);
+                            flag = 0;
+                        }
+                        // если  не последний элемент текущего списка
+                        else if (tmp_iter->hasNext())
+                        {
+                            this->list_arr[hash_num]->remove(tmp_iter);
+                            flag = 0;
+                        }
 
-                    if (flag == 0)
-                        this->set_count--;
-                    if (tmp_iter != nullptr)
-                        tmp_iter = nullptr;
+                        if (flag == 0)
+                            this->set_count--;
+                        if (tmp_iter != nullptr)
+                            tmp_iter = nullptr;
+                        delete help;
+                        delete it;
+                    }
                 }
             }
         }

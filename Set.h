@@ -9,12 +9,12 @@
 
 using namespace std;
 
-class Set :public AbstractSet {
+class Set :public AbstractSet{
     size_t set_count;
     int hash_size;
     List** list_arr; //List* -тип, * массив списков
     public:
-    Set(MemoryManager &mem, int hash_size) :AbstractSet(mem) {
+    Set(MemoryManager &mem, int hash_size) :AbstractSet(mem){
         this->set_count = 0;
         this->hash_size = hash_size;
         this->list_arr = (List**)_memory.allocMem(sizeof(List*) * hash_size);
@@ -30,7 +30,7 @@ class Set :public AbstractSet {
         size_t index;
         void *curent; //head 
         size_t end_i;
-        Container::Iterator* end;
+        //Container::Iterator* end;
         //List::Iterator *end;
         Container::Iterator* iter_l;
         //List::Iterator* iter_l; // указатель на итератор списка 0
@@ -48,11 +48,22 @@ class Set :public AbstractSet {
         // Возвращает неявно индекс последнего заполненого листа. 
         // Перемещает указатель конца на последний элемент этого списка.
         // Явно возращает 1 в случае успеха и 0 неудачи.
-        void find_end(size_t &index_end);
+        //void find_end(size_t &index_end);
 
+        void shiftIter(List* list, Container::Iterator* listIter);
         friend class Set;
+        friend class Test;
         ~Iterator();
+
+        /*void operator delete(void*, Container::Iterator* iter)
+        {
+            Set::Iterator* it = (Set::Iterator*)iter;
+            it->~Iterator();
+        }*/
     };
+
+
+
 
     class Error //класс вывода ошибок
     {
@@ -85,4 +96,5 @@ class Set :public AbstractSet {
 
     ~Set();
     friend class Set::Iterator;
+    friend class Test;
 };
